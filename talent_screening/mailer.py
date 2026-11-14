@@ -1,7 +1,7 @@
 """Candidate emails: templates for shortlist and rejection, and sending through SMTP.
 
-If SMTP is not configured (no SMTP_USER / SMTP_PASSWORD), emails are stored in the outbox with
-status LOGGED instead of being sent, so the demo works without a mailbox.
+Delivery: the Gmail API (OAuth, preferred) if connected, otherwise SMTP if SMTP_USER / SMTP_PASSWORD are set,
+otherwise emails are stored in the outbox with status LOGGED so the demo works without a mailbox.
 """
 import os
 import re
@@ -64,3 +64,16 @@ def send(to: str, subject: str, body: str, reply_to: str | None = None) -> str:
         s.login(user, os.environ["SMTP_PASSWORD"])
         s.send_message(msg)
     return msg["Message-ID"]
+
+
+def sending_configured() -> bool:
+    from talent_screening import gmail
+    return gmail.configured() or smtp_configured()
+
+
+def deliver(to: str, subject: str, body: str, reply_to: str | None = None) -> str:
+    """Send through the Gmail API if connected, else SMTP. Returns the provider's message id."""
+    from talent_screening import gmail
+    if gmail.configured():
+        return gmail.send(to, subject, body, reply_to=reply_to)
+    return send(to, subject, body, reply_to=reply_to)

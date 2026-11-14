@@ -5,3 +5,5 @@ __pycache__/
 .pytest_cache/
 data/inbox_cache/
 data/profiles_cache.json
+credentials.json
+token.json

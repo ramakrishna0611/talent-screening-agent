@@ -98,6 +98,7 @@ def test_frontend_served(client):
 
 def test_shortlist_preview_and_email_logged_without_smtp(client, monkeypatch):
     monkeypatch.delenv("SMTP_USER", raising=False)
+    monkeypatch.setattr(api.mailer, "sending_configured", lambda: False)
     login(client)
     app_id = next(r["id"] for r in client.get("/api/jobs/KST-101/applications").json() if r["name"] == "Aarav Mehta")
     p = client.get(f"/api/applications/{app_id}/email-preview?decision=SHORTLISTED").json()
@@ -114,7 +115,7 @@ def test_reject_email_sent_through_smtp(client, monkeypatch):
     sent = []
     monkeypatch.setenv("SMTP_USER", "kestrel.careers.demo@gmail.com")
     monkeypatch.setenv("SMTP_PASSWORD", "app-password")
-    monkeypatch.setattr(api.mailer, "send", lambda to, subject, body, reply_to=None: sent.append((to, subject)) or "<id>")
+    monkeypatch.setattr(api.mailer, "deliver", lambda to, subject, body, reply_to=None: sent.append((to, subject)) or "<id>")
     login(client)
     app_id = next(r["id"] for r in client.get("/api/jobs/KST-101/applications").json() if r["name"] == "Arjun Patel")
     r = client.post(f"/api/applications/{app_id}/decision",

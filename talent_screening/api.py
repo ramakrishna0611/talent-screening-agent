@@ -191,7 +191,7 @@ def email_preview(app_id: int, decision: str, user: Recruiter = Depends(current)
                           org=org.name, recruiter=user.name)
     already = [e for e in _emails(db, a.id) if e["kind"] == decision and e["status"] in ("SENT", "LOGGED")]
     return {**draft, "to": a.candidate_email, "valid_to": bool(a.candidate_email and mailer.EMAIL_RE.match(a.candidate_email)),
-            "smtp": mailer.smtp_configured(), "already_sent": bool(already)}
+            "smtp": mailer.sending_configured(), "already_sent": bool(already)}
 
 
 @app.post("/api/applications/{app_id}/decision")
@@ -214,9 +214,9 @@ def decide(app_id: int, body: DecisionIn, user: Recruiter = Depends(current), db
             record = OutboundEmail(org_id=user.org_id, application_id=a.id, kind=body.decision, to_address=to,
                                    subject=body.email.subject.strip()[:200], body=body.email.body.strip(),
                                    status="LOGGED", sent_by=user.id)
-            if mailer.smtp_configured():
+            if mailer.sending_configured():
                 try:
-                    mailer.send(to, record.subject, record.body, reply_to=user.email)
+                    mailer.deliver(to, record.subject, record.body, reply_to=user.email)
                     record.status = "SENT"
                 except Exception as e:            # SMTP problems are reported, the decision itself stays saved
                     record.status, record.error = "FAILED", f"{type(e).__name__}: {e}"[:300]
