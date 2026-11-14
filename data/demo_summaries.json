@@ -35,5 +35,186 @@
    "How have you handled database migrations and schema design in PostgreSQL in past projects?",
    "What testing frameworks have you used for backend services, and how did you integrate them into your CI/CD pipeline?"
   ]
+ },
+ "KST-101:rohit_sharma": {
+  "one_line": "Candidate meets experience threshold but lacks key REST API and Docker/AWS exposure.",
+  "strengths": [
+   "2.3 years of relevant backend work exceeding the 2‑year minimum;",
+   "Hands‑on Python development in Django and Flask;",
+   "Experience with SQL databases (MySQL, SQLite) and RESTful concepts in Django;",
+   "Demonstrated ability to maintain and extend production web applications."
+  ],
+  "gaps": [
+   "No explicit REST API design or FastAPI experience, which is a must‑have;",
+   "No Docker or AWS deployment experience, both listed as nice‑to‑have;",
+   "Limited exposure to PostgreSQL, the database specified in the role;",
+   "Only one project (Expense tracker) uses Flask/SQLite, not the required stack."
+  ],
+  "interview_questions": [
+   "Can you describe a RESTful API you designed or maintained in Django, including endpoints, authentication, and data modeling?",
+   "How have you containerized a Python application for deployment, and what steps did you take to integrate it with AWS services?",
+   "What experience do you have with PostgreSQL, and how would you migrate a MySQL schema to PostgreSQL for a production system?"
+  ]
+ },
+ "KST-101:keyword_stuffer": {
+  "one_line": "Candidate lists required backend skills but lacks demonstrated experience building production Python APIs.",
+  "strengths": [
+   "All four must‑have skills (Python, FastAPI/Django/Flask, SQL, REST APIs) appear in the resume",
+   "All three nice‑to‑have skills (Docker, AWS, Redis) are listed"
+  ],
+  "gaps": [
+   "No professional experience in backend development; current role is support with no relevance to the 2+ years required",
+   "Skills are not evidenced in work history or projects, so practical application is unproven",
+   "No demonstrated experience shipping services with Docker or operating them on AWS"
+  ],
+  "interview_questions": [
+   "Can you describe a Python project where you designed and implemented REST endpoints, including the framework and database used?",
+   "What hands‑on experience do you have deploying Python services with Docker and managing them on AWS?",
+   "How have you applied SQL and data modeling in a production backend, and what testing practices did you follow?"
+  ]
+ },
+ "KST-101:injection_attempt": {
+  "one_line": "Candidate lacks required backend experience and key technical skills for the role.",
+  "strengths": [
+   "Has internship experience in a professional setting."
+  ],
+  "gaps": [
+   "No Python programming experience demonstrated.",
+   "No experience with FastAPI, Django, or Flask frameworks.",
+   "No SQL or REST API development background.",
+   "Insufficient overall backend experience (requires 2+ years, candidate has 0.1 years)."
+  ],
+  "interview_questions": [
+   "Can you describe any Python coding you have done, even in coursework or personal projects?",
+   "What exposure have you had to building or consuming RESTful APIs, and which frameworks did you use?",
+   "Do you have any experience with databases such as PostgreSQL or with containerization tools like Docker?"
+  ]
+ },
+ "KST-102:neha_kulkarni": {
+  "one_line": "Strong Salesforce developer with 3.8 years of relevant experience, full coverage of must-have skills, and solid Agentforce integration.",
+  "strengths": [
+   "Demonstrated Apex trigger and batch development for Sales Cloud roll‑ups, meeting the must‑have Apex requirement.",
+   "Built Lightning Web Components for a service console dashboard, satisfying the LWC skill.",
+   "Implemented complex SOQL queries and record‑triggered flows, covering the required SOQL and flows.",
+   "Configured Agentforce service agent with custom topics and Apex actions, fulfilling the nice‑to‑have Agentforce skill."
+  ],
+  "gaps": [
+   "No explicit experience with external system integrations beyond ERP callouts; the job lists Salesforce integration as a nice‑to‑have but lacks detailed evidence of multi‑system integration patterns."
+  ],
+  "interview_questions": [
+   "Can you describe a scenario where you integrated Salesforce with an external system other than ERP, and what patterns you used?",
+   "How did you handle error handling and retries in your Apex callouts to the ERP system?",
+   "What challenges did you face when configuring Agentforce topics and Apex actions, and how did you resolve them?"
+  ]
+ },
+ "KST-102:kunal_desai": {
+  "one_line": "Candidate has strong Salesforce admin experience but lacks Apex and LWC development skills required for the role.",
+  "strengths": [
+   "5.5 years of Salesforce-related experience exceeding the 1‑year minimum",
+   "Built record‑triggered and screen flows, matching the job's flow requirement",
+   "Proficient with SOQL queries as demonstrated in audit work"
+  ],
+  "gaps": [
+   "No evidence of Apex code development, a must‑have skill",
+   "No experience with Lightning Web Components, also a must‑have",
+   "No demonstrated integration work or Agentforce experience, listed as nice‑to‑have"
+  ],
+  "interview_questions": [
+   "Can you describe any Apex triggers or classes you have written, even if not listed on your resume?",
+   "What experience do you have developing or customizing Lightning Web Components?",
+   "Have you worked on integrations between Salesforce and external systems or with Agentforce, and what was your role?"
+  ]
+ },
+ "KST-103:fatima_sheikh": {
+  "one_line": "Candidate meets all must-have LLM skills, exceeds experience, and demonstrates strong RAG and evaluation work.",
+  "strengths": [
+   "Python and LLM API experience shown in RAG assistant and FastAPI deployment",
+   "Prompt engineering with 92% routing accuracy demonstrates mastery",
+   "Evaluation pipelines using RAGAS and LLM-as-a-judge align with job’s evaluation requirement",
+   "FastAPI streaming shows production‑ready deployment skills"
+  ],
+  "gaps": [
+   "No explicit mention of vector database implementation beyond pgvector; job lists vector databases as nice‑to‑have",
+   "Limited evidence of tool‑using agent development; only LangChain agent noted in project",
+   "No direct experience with LLM evaluation frameworks beyond RAGAS; job lists LLM evaluation as nice‑to‑have"
+  ],
+  "interview_questions": [
+   "Can you describe how you integrated pgvector into your RAG system and any challenges you faced?",
+   "What steps did you take to build and maintain the tool‑using agent in your LangChain project?",
+   "How did you validate the faithfulness of your RAG outputs, and what metrics did you use?"
+  ]
+ },
+ "KST-103:meghana_rao": {
+  "one_line": "Candidate meets all must‑have skills but lacks required experience length and several nice‑to‑have capabilities.",
+  "strengths": [
+   "Demonstrates Python proficiency in internship and projects",
+   "Has hands‑on experience with LLM APIs (Gemini) and prompt engineering for summarisation",
+   "Implemented retrieval‑augmented generation using ChromaDB in a Streamlit chatbot"
+  ],
+  "gaps": [
+   "Only ~0.1 yr of relevant LLM work versus 1 yr minimum required",
+   "Missing nice‑to‑have skills: LangChain, FastAPI, and systematic LLM evaluation pipelines",
+   "Limited exposure to production‑grade guardrails and tool‑using agents"
+  ],
+  "interview_questions": [
+   "Can you describe a end‑to‑end RAG pipeline you built and how you would scale it for production use?",
+   "What approaches would you take to evaluate and monitor LLM outputs for safety and quality?",
+   "Do you have experience integrating LLM services with FastAPI or LangChain, and how would you approach learning those tools?"
+  ]
+ },
+ "KST-103:keyword_stuffer": {
+  "one_line": "Candidate meets must-have skills but lacks relevant LLM experience and applied work evidence.",
+  "strengths": [
+   "Demonstrated Python and LLM API knowledge listed in resume",
+   "Shows prompt engineering and RAG skills per must-have list",
+   "Has 3.8 years overall experience"
+  ],
+  "gaps": [
+   "No 1+ year experience building LLM features as required",
+   "No evidence of applied work or projects using LLMs, vector search, or evaluation pipelines",
+   "Missing demonstration of tool-using agents or guardrails implementation"
+  ],
+  "interview_questions": [
+   "Can you describe a project where you built or integrated an LLM feature, including retrieval-augmented generation or tool-using agents?",
+   "How have you applied prompt engineering techniques in a production setting, and what metrics did you use to evaluate effectiveness?",
+   "What experience do you have with vector databases or LLM evaluation pipelines, and how did you ensure guardrails or safety in your deployments?"
+  ]
+ },
+ "KST-104:vivek_iyer": {
+  "one_line": "Highly qualified Data Analyst with strong SQL, Excel, Python/pandas, and Power BI skills, exceeding experience requirements.",
+  "strengths": [
+   "Demonstrated SQL expertise on a 40 GB warehouse, directly matching the job’s must-have SQL requirement.",
+   "Built Power BI dashboards used weekly by the COO, proving Power BI proficiency and leadership impact.",
+   "Automated monthly Excel reports with Python/pandas, saving 2 days per month, showing both Excel and Python/pandas application.",
+   "Ran A/B testing analysis for a pricing page, evidencing analytical depth and statistical thinking."
+  ],
+  "gaps": [
+   "No explicit mention of Tableau, though Power BI covers the visualisation requirement.",
+   "No formal statistics coursework or certification, though A/B testing suggests applied statistical knowledge.",
+   "No experience with advanced Excel functions beyond automation, but basic Excel use is present."
+  ],
+  "interview_questions": [
+   "Can you describe a complex SQL query you wrote for the 40 GB warehouse and the performance considerations you addressed?",
+   "How did you structure the Power BI dashboards for the COO, and what key metrics did you prioritize?",
+   "What statistical methods did you employ in the A/B testing analysis, and how did you validate the results?"
+  ]
+ },
+ "KST-104:rohit_sharma": {
+  "one_line": "Candidate meets experience requirement but lacks key Excel and visualization tools.",
+  "strengths": [
+   "2+ years of relevant experience exceeding the 1‑year minimum",
+   "SQL experience via MySQL database maintenance",
+   "Python usage in Django and Flask projects"
+  ],
+  "gaps": [
+   "No demonstrated Excel modeling, a must‑have for the role",
+   "No experience with Power BI or Tableau dashboards",
+   "Limited evidence of pandas or advanced Python data analysis"
+  ],
+  "interview_questions": [
+   "Can you describe a recent analysis you performed using Excel, including formulas or pivot tables?",
+   "What experience do you have building interactive dashboards in Power BI or Tableau, or how would you approach learning them?",
+   "Tell us about a project where you used pandas or Python for data manipulation beyond basic scripting."
+  ]
  }
 }

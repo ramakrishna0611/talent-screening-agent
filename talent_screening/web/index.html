@@ -25,24 +25,16 @@
       <li><b>Prompt-injection resistant</b>: hidden instructions in a resume change nothing</li>
     </ul>
     <div class="stub">
-      <div class="stub-head">Demo credentials</div>
-      <div class="stub-row"><span>Kestrel Systems</span><code>KSTL01 · kestrel@2026 · priya@kestrel.test</code></div>
-      <div class="stub-row"><span>Saffron Cloudworks</span><code>SAFR02 · saffron@2026 · rahul@saffron.test</code></div>
-      <div class="stub-row"><span>Recruiter password</span><code>Welcome@123</code></div>
+      <div class="stub-head">Demo login</div>
+      <div class="stub-row"><span>Kestrel Systems · HR</span><code>priya@kestrel.test · Welcome@123</code></div>
     </div>
   </div>
   <div class="card login-card">
-    <div class="steps"><b id="s1" class="on">1 · Company</b><b id="s2">2 · Recruiter</b></div>
-    <form id="org-form" class="form">
-      <label>Company code<input name="code" required placeholder="KSTL01" autocomplete="off"></label>
-      <label>Company password<input name="password" type="password" required></label>
-      <button class="btn ink" type="submit">Continue →</button>
-    </form>
-    <form id="user-form" class="form" hidden>
-      <div class="org-chosen" id="org-chosen"></div>
-      <label>Recruiter email<input name="email" type="email" required placeholder="priya@kestrel.test"></label>
-      <label>Password<input name="password" type="password" required></label>
-      <div class="row-btns"><button class="btn ghost" type="button" id="back">← Back</button><button class="btn ink" type="submit">Sign in</button></div>
+    <div class="login-title">Kestrel Systems · HR sign in</div>
+    <form id="login-form" class="form">
+      <label>Work email<input name="email" type="email" required placeholder="priya@kestrel.test" autocomplete="username"></label>
+      <label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+      <button class="btn ink" type="submit">Sign in →</button>
     </form>
     <p class="error" id="login-error" role="alert"></p>
   </div>
@@ -54,6 +46,7 @@
     <div class="brand">Sieve<span>.</span></div>
     <span id="org" class="org"></span>
     <div class="top-right">
+      <button class="btn small inbox-btn" id="inbox-btn" type="button">Inbox <i id="inbox-badge" hidden></i></button>
       <label class="switch" title="Hide candidate names while reviewing">
         <input type="checkbox" id="blind"><span class="track"><i></i></span>Blind review
       </label>
@@ -109,6 +102,19 @@
       <button class="btn ink" type="submit" id="mail-confirm">Confirm</button>
     </div>
   </form>
+</dialog>
+
+<dialog id="inbox-dialog" class="inbox-dialog">
+  <div class="dialog-head"><h3>Careers inbox</h3><button class="icon-btn" id="inbox-close" aria-label="Close">×</button></div>
+  <div class="inbox-body">
+    <div class="inbox-top">
+      <p class="sub" id="inbox-status"></p>
+      <button class="btn ink small" id="inbox-check">Check inbox now</button>
+    </div>
+    <p class="sub">Applications sent to the careers mailbox with a resume attached are matched to a role (job code, job title,
+      or an AI match above 70% confidence), screened and labelled in Gmail. Unclear ones wait here for you.</p>
+    <div id="inbox-list"></div>
+  </div>
 </dialog>
 
 <div id="toasts" class="toasts" aria-live="polite"></div>

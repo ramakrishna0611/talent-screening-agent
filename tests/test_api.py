@@ -41,20 +41,22 @@ def client(monkeypatch):
     api.app.dependency_overrides.clear()
 
 
-def login(c, code="KSTL01", pw="kestrel@2026", email="priya@kestrel.test"):
-    assert c.post("/api/login/org", json={"code": code, "password": pw}).status_code == 200
-    assert c.post("/api/login/user", json={"email": email, "password": "Welcome@123"}).status_code == 200
+def login(c, email="priya@kestrel.test", pw="Welcome@123"):
+    assert c.post("/api/login", json={"email": email, "password": pw}).status_code == 200
 
 
 def test_requires_login(client):
     assert client.get("/api/jobs").status_code == 401
 
 
-def test_jobs_are_company_scoped(client):
+def test_wrong_password_rejected(client):
+    assert client.post("/api/login", json={"email": "priya@kestrel.test", "password": "nope"}).status_code == 401
+
+
+def test_jobs_listed(client):
     login(client)
-    codes = [j["code"] for j in client.get("/api/jobs").json()]
-    assert codes == ["KST-101", "KST-102", "KST-103"]
-    assert client.get("/api/jobs/SAF-201/applications").status_code == 404     # other company's job
+    assert [j["code"] for j in client.get("/api/jobs").json()] == ["KST-101", "KST-102", "KST-103", "KST-104", "KST-105"]
+    assert client.get("/api/jobs/XYZ-999/applications").status_code == 404
 
 
 def test_ranked_candidates_and_scorecard(client):
@@ -81,15 +83,13 @@ def test_upload_scores_with_pipeline(client):
     assert "Unsupported" in bad[0]["error"]
 
 
-def test_decision_and_isolation(client):
+def test_decision_saved_and_validated(client):
     login(client)
     app_id = client.get("/api/jobs/KST-101/applications").json()[0]["id"]
     assert client.post(f"/api/applications/{app_id}/decision", json={"decision": "SHORTLISTED"}).json()["ok"]
     assert client.post(f"/api/applications/{app_id}/decision", json={"decision": "HIRED!!"}).status_code == 400
     client.post("/api/logout")
-    login(client, "SAFR02", "saffron@2026", "rahul@saffron.test")
-    assert client.get(f"/api/applications/{app_id}").status_code == 404
-    assert client.post(f"/api/applications/{app_id}/decision", json={"decision": "REJECTED"}).status_code == 404
+    assert client.get(f"/api/applications/{app_id}").status_code == 401
 
 
 def test_frontend_served(client):

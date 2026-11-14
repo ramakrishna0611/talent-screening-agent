@@ -36,24 +36,12 @@ $("#blind").addEventListener("change", e => {
 });
 
 // ---------- login ----------
-function showLogin() {
-  $("#app").hidden = true; $("#login").hidden = false; $("#org-form").hidden = false; $("#user-form").hidden = true;
-  $("#s1").classList.add("on"); $("#s2").classList.remove("on");
-}
-$("#org-form").addEventListener("submit", async e => {
+function showLogin() { $("#app").hidden = true; $("#login").hidden = false; $("#login-form [name=email]").focus(); }
+$("#login-form").addEventListener("submit", async e => {
   e.preventDefault(); const f = new FormData(e.target); $("#login-error").textContent = "";
-  try {
-    const r = await api("/api/login/org", { body: { code: f.get("code"), password: f.get("password") } });
-    $("#org-chosen").textContent = r.org; $("#org-form").hidden = true; $("#user-form").hidden = false;
-    $("#s1").classList.remove("on"); $("#s2").classList.add("on"); $("#user-form [name=email]").focus();
-  } catch (err) { $("#login-error").textContent = err.message; }
-});
-$("#user-form").addEventListener("submit", async e => {
-  e.preventDefault(); const f = new FormData(e.target); $("#login-error").textContent = "";
-  try { await api("/api/login/user", { body: { email: f.get("email"), password: f.get("password") } }); e.target.reset(); boot(); }
+  try { await api("/api/login", { body: { email: f.get("email"), password: f.get("password") } }); e.target.reset(); boot(); }
   catch (err) { $("#login-error").textContent = err.message; }
 });
-$("#back").addEventListener("click", showLogin);
 $("#logout").addEventListener("click", async () => { await api("/api/logout", { body: {} }); state.job = null; state.appId = null; showLogin(); });
 
 // ---------- boot ----------
@@ -63,6 +51,7 @@ async function boot() {
   $("#org").textContent = state.me.org; $("#who").textContent = state.me.name;
   await loadJobs();
   if (!state.job && state.jobs.length) selectJob(state.jobs[0].code);
+  loadInbox().catch(() => {});
 }
 
 async function loadJobs() {
@@ -222,6 +211,48 @@ const drop = $("#drop");
 ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
 drop.addEventListener("drop", e => uploadFiles(e.dataTransfer.files));
+
+// ---------- careers inbox ----------
+const ROUTE_LABEL = { job_code: "job code in email", title: "job title in email", ai_match: "AI match",
+                      manual: "routed by you", needs_routing: "needs routing" };
+async function loadInbox() {
+  const d = await api("/api/inbox");
+  const waiting = d.items.filter(i => i.status === "NEEDS_ROUTING").length;
+  $("#inbox-badge").hidden = !waiting; $("#inbox-badge").textContent = waiting;
+  $("#inbox-status").textContent = d.connected ? "Gmail connected." : "Gmail is not connected (run scripts/gmail_auth.py).";
+  $("#inbox-check").disabled = !d.connected;
+  const jobOptions = state.jobs.map(j => `<option value="${j.code}">${esc(j.code)} · ${esc(j.title)}</option>`).join("");
+  $("#inbox-list").innerHTML = d.items.length ? d.items.map(i => {
+    const r = i.routing || {};
+    const how = r.method ? `${ROUTE_LABEL[r.method] || r.method}${r.job_codes && r.job_codes.length ? " → " + r.job_codes.join(", ") : ""}` +
+      (r.confidence !== undefined && r.method === "ai_match" ? ` (${Math.round(r.confidence * 100)}%)` : "") : "";
+    return `<div class="mail-item"><div class="top"><span class="subj">${esc(i.subject)}</span><span class="st ${i.status}">${i.status.replace("_", " ")}</span></div>
+      <span class="sub">${esc(i.from)} · ${esc(i.at)}${i.file ? " · " + esc(i.file) : ""}</span>
+      <span>${esc(i.outcome)}${how ? ` <span class="sub">(${esc(how)}${r.reason ? ": " + esc(r.reason) : ""})</span>` : ""}</span>
+      ${i.status === "NEEDS_ROUTING" ? `<div class="route"><select data-id="${i.id}">${r.suggested ? `<option value="${r.suggested}">Suggested: ${esc(r.suggested)}</option>` : ""}${jobOptions}</select>
+        <button class="btn ink small" data-route="${i.id}">Screen for this role</button></div>` : ""}</div>`;
+  }).join("") : '<p class="empty">No emails processed yet.</p>';
+  $$("[data-route]").forEach(b => b.addEventListener("click", async () => {
+    const code = $(`select[data-id="${b.dataset.route}"]`).value;
+    b.disabled = true; b.textContent = "Screening…";
+    try { const r = await api(`/api/inbox/${b.dataset.route}/route`, { body: { job_code: code } });
+          toast(`Screened for ${code}.`); await Promise.all([loadInbox(), loadJobs()]);
+          if (state.job === code) loadCands(); }
+    catch (err) { toast(err.message, true); b.disabled = false; b.textContent = "Screen for this role"; }
+  }));
+}
+$("#inbox-btn").addEventListener("click", async () => { await loadInbox(); $("#inbox-dialog").showModal(); });
+$("#inbox-close").addEventListener("click", () => $("#inbox-dialog").close());
+$("#inbox-check").addEventListener("click", async () => {
+  const b = $("#inbox-check"); b.disabled = true; b.textContent = "Checking…";
+  try {
+    const s = await api("/api/inbox/check", { body: {} });
+    toast(`Checked ${s.checked} new email(s): ${s.screened} screened, ${s.needs_routing} need routing, ${s.skipped} skipped` +
+          (s.quota_reached ? ". AI quota reached: remaining emails will be retried later" : s.errors ? `, ${s.errors} errors (will retry)` : "") + ".", s.errors > 0);
+    await Promise.all([loadInbox(), loadJobs()]); if (state.job) loadCands();
+  } catch (err) { toast(err.message, true); }
+  finally { b.disabled = false; b.textContent = "Check inbox now"; }
+});
 
 // ---------- mobile tabs ----------
 function showTab(t) {

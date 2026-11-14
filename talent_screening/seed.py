@@ -1,4 +1,4 @@
-"""Demo data: the same two fictional companies as the leave tracker, with open roles and recruiters.
+"""Demo data: one fictional company (Kestrel Systems), one HR user and five open roles.
 
 Run:  python -m talent_screening.seed
 """
@@ -33,19 +33,15 @@ ORGS = [
           "description": "Build LLM features for customers: retrieval-augmented generation over company documents, "
                          "tool-using agents, evaluation pipelines and guardrails. Python, LLM APIs, prompt "
                          "engineering and vector search. 1+ year building with LLMs."},
-     ]},
-    {"name": "Saffron Cloudworks", "code": "SAFR02", "password": "saffron@2026",
-     "recruiters": [("Rahul Menon", "rahul@saffron.test")],
-     "jobs": [
-         {"code": "SAF-201", "title": "Data Analyst", "min_years": 1,
+         {"code": "KST-104", "title": "Data Analyst", "min_years": 1,
           "must_have": [["sql"], ["excel"], ["pandas", "python"], ["power bi", "tableau"]],
           "nice_to_have": ["statistics", "python"],
           "description": "Turn product and billing data into decisions: SQL queries, Excel models, Python/pandas "
                          "analysis and Power BI or Tableau dashboards for leadership. 1+ year in analytics."},
-         {"code": "SAF-202", "title": "Frontend Engineer (React)", "min_years": 2,
+         {"code": "KST-105", "title": "Frontend Engineer (React)", "min_years": 2,
           "must_have": [["javascript"], ["react"], ["html"], ["css"]],
           "nice_to_have": ["typescript", "next.js", "frontend testing"],
-          "description": "Own Saffron's customer console: React components, accessible HTML and CSS, TypeScript, "
+          "description": "Own Kestrel's customer console: React components, accessible HTML and CSS, TypeScript, "
                          "Next.js and automated UI tests. 2+ years shipping web frontends."},
      ]},
 ]
@@ -70,8 +66,8 @@ DEMO_APPLICATIONS = {
     "KST-101": ["aarav_mehta", "arjun_patel", "rohit_sharma", "keyword_stuffer", "injection_attempt"],
     "KST-102": ["neha_kulkarni", "kunal_desai"],
     "KST-103": ["fatima_sheikh", "meghana_rao", "keyword_stuffer"],
-    "SAF-201": ["vivek_iyer", "rohit_sharma"],
-    "SAF-202": ["sanya_gupta"],
+    "KST-104": ["vivek_iyer", "rohit_sharma"],
+    "KST-105": ["sanya_gupta"],
 }
 
 
@@ -118,9 +114,8 @@ def main() -> None:
     with make_session_factory(DB_URL)() as db:
         seed(db)
         n = seed_demo_applications(db)
-    print(f"Seeded 2 companies, 5 open jobs, {n} demo applications. "
-          "Recruiters: priya@kestrel.test (KSTL01 / kestrel@2026), rahul@saffron.test (SAFR02 / saffron@2026), "
-          "password " + PASSWORD)
+    print(f"Seeded Kestrel Systems with 5 open roles and {n} demo applications. HR login: priya@kestrel.test / "
+          + PASSWORD)
 
 
 if __name__ == "__main__":

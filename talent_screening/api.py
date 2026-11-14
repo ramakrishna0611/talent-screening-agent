@@ -16,8 +16,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
-from talent_screening import mailer
-from talent_screening.models import (DECISIONS, Application, AuditLog, Job, Organization, OutboundEmail, Recruiter,
+from talent_screening import gmail, intake, mailer
+from talent_screening.models import (DECISIONS, Application, AuditLog, EmailLog, Job, Organization, OutboundEmail, Recruiter,
                                      make_session_factory)
 from talent_screening.parsing import UnsupportedFile
 from talent_screening.pipeline import screen
@@ -68,11 +68,6 @@ def own_application(db: Session, user: Recruiter, app_id: int) -> Application:
     return a
 
 
-class OrgLogin(BaseModel):
-    code: str
-    password: str
-
-
 class UserLogin(BaseModel):
     email: str
     password: str
@@ -95,24 +90,13 @@ def _check(pw: str, hashed: str) -> bool:
 
 
 # ---------- auth ----------
-@app.post("/api/login/org")
-def login_org(body: OrgLogin, request: Request, db: Session = Depends(get_db)):
-    org = db.scalar(select(Organization).where(Organization.code == body.code.strip().upper()))
-    if org is None or not _check(body.password, org.password_hash):
-        raise HTTPException(401, "Invalid company code or password.")
-    request.session.clear()
-    request.session["org_id"] = org.id
-    return {"org": org.name}
-
-
-@app.post("/api/login/user")
-def login_user(body: UserLogin, request: Request, db: Session = Depends(get_db)):
-    org_id = request.session.get("org_id")
-    if not org_id:
-        raise HTTPException(401, "Enter your company code first.")
-    r = db.scalar(select(Recruiter).where(Recruiter.org_id == org_id, Recruiter.email == body.email.strip().lower()))
+@app.post("/api/login")
+def login(body: UserLogin, request: Request, db: Session = Depends(get_db)):
+    """Single HR sign-in (one company). Records still carry org_id, so more companies can be added later."""
+    r = db.scalar(select(Recruiter).where(Recruiter.email == body.email.strip().lower()))
     if r is None or not _check(body.password, r.password_hash):
         raise HTTPException(401, "Invalid email or password.")
+    request.session.clear()
     request.session["recruiter_id"] = r.id
     return {"name": r.name}
 
@@ -247,6 +231,45 @@ async def upload(code: str, files: list[UploadFile] = File(...), user: Recruiter
             db.rollback()
             results.append({"file": f.filename, "error": "AI quota reached (free tier). Try again later."})
     return results
+
+
+# ---------- careers inbox ----------
+class RouteIn(BaseModel):
+    job_code: str
+
+
+@app.get("/api/inbox")
+def inbox(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    rows = db.scalars(select(EmailLog).where(EmailLog.org_id == user.org_id)
+                      .order_by(EmailLog.received_at.desc()).limit(50))
+    return {"connected": gmail.configured(),
+            "mailbox": os.getenv("INTAKE_MAILBOX_LABEL", ""),
+            "items": [{"id": e.id, "from": e.sender, "subject": e.subject, "status": e.status, "outcome": e.outcome,
+                       "routing": e.routing, "file": e.file_name, "applications": e.application_ids,
+                       "at": e.received_at.strftime("%d %b, %H:%M")} for e in rows]}
+
+
+@app.post("/api/inbox/check")
+def check_inbox(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    if not gmail.configured():
+        raise HTTPException(400, "Gmail is not connected. Run scripts/gmail_auth.py first.")
+    try:
+        return intake.process_inbox(db)
+    except RateLimitError:
+        raise HTTPException(429, "AI quota reached (free tier). Emails stay unread-for-us and will be retried.")
+
+
+@app.post("/api/inbox/{log_id}/route")
+def route_email(log_id: int, body: RouteIn, user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    log = db.get(EmailLog, log_id)
+    if log is None or log.org_id != user.org_id or log.status != "NEEDS_ROUTING" or not log.resume_text:
+        raise HTTPException(404, "Nothing to route for this email.")
+    job = own_job(db, user, body.job_code)
+    try:
+        app_id = intake.route_manually(db, log, job, actor_id=user.id)
+    except RateLimitError:
+        raise HTTPException(429, "AI quota reached (free tier). Try again later.")
+    return {"ok": True, "application_id": app_id}
 
 
 # ---------- frontend ----------

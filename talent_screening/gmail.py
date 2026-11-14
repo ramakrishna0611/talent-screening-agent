@@ -67,3 +67,41 @@ def send(to: str, subject: str, body: str, reply_to: str | None = None) -> str:
     if r.status_code >= 400:
         raise RuntimeError(f"Gmail API {r.status_code}: {r.text[:200]}")
     return r.json()["id"]
+
+
+# ---------- reading the careers inbox ----------
+def list_message_ids(query: str, limit: int = 25) -> list[str]:
+    r = session().get(f"{API}/messages", params={"q": query, "maxResults": limit}, timeout=30)
+    r.raise_for_status()
+    return [m["id"] for m in r.json().get("messages", [])]
+
+
+def get_message(msg_id: str) -> dict:
+    r = session().get(f"{API}/messages/{msg_id}", params={"format": "full"}, timeout=30)
+    r.raise_for_status()
+    return r.json()
+
+
+def get_attachment(msg_id: str, attachment_id: str) -> bytes:
+    r = session().get(f"{API}/messages/{msg_id}/attachments/{attachment_id}", timeout=60)
+    r.raise_for_status()
+    return base64.urlsafe_b64decode(r.json()["data"])
+
+
+def ensure_label(name: str) -> str:
+    """Return the id of a Gmail label, creating it if needed (e.g. 'Sieve/Processed')."""
+    s = session()
+    r = s.get(f"{API}/labels", timeout=30)
+    r.raise_for_status()
+    for label in r.json().get("labels", []):
+        if label["name"] == name:
+            return label["id"]
+    r = s.post(f"{API}/labels", json={"name": name, "labelListVisibility": "labelShow",
+                                       "messageListVisibility": "show"}, timeout=30)
+    r.raise_for_status()
+    return r.json()["id"]
+
+
+def add_labels(msg_id: str, label_ids: list[str]) -> None:
+    r = session().post(f"{API}/messages/{msg_id}/modify", json={"addLabelIds": label_ids}, timeout=30)
+    r.raise_for_status()

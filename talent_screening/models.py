@@ -68,13 +68,20 @@ class Application(Base):
 
 
 class EmailLog(Base):
+    """One incoming email in the careers inbox and what the intake did with it."""
     __tablename__ = "email_log"
     id: Mapped[int] = mapped_column(primary_key=True)
-    message_id: Mapped[str] = mapped_column(String(300), unique=True)   # never process the same email twice
+    message_id: Mapped[str] = mapped_column(String(300), unique=True)   # Gmail id: never process an email twice
     org_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"))
     sender: Mapped[str] = mapped_column(String(300))
+    sender_email: Mapped[str | None] = mapped_column(String(200))
     subject: Mapped[str] = mapped_column(String(500))
-    outcome: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(15), default="PROCESSED")  # PROCESSED, NEEDS_ROUTING, SKIPPED, ERROR
+    outcome: Mapped[str] = mapped_column(String(500))
+    routing: Mapped[dict] = mapped_column(JSON, default=dict)            # method, job codes, confidence, reason
+    file_name: Mapped[str | None] = mapped_column(String(200))
+    resume_text: Mapped[str | None] = mapped_column(Text)               # kept only while waiting for routing
+    application_ids: Mapped[list] = mapped_column(JSON, default=list)
     received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 
