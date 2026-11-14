@@ -1,0 +1,16 @@
+Meghana Rao
+meghana.rao@example.com
+
+EDUCATION
+B.Tech Computer Science (AI & ML), JNTU Hyderabad, 2026 (expected)
+
+INTERNSHIP
+AI Intern, Sparkfield Labs (May 2025 - Jul 2025)
+- Experimented with the Gemini API and prompt engineering for summarising meeting notes.
+
+PROJECTS
+Study buddy chatbot: Python Streamlit app using RAG over lecture PDFs with ChromaDB.
+Image classifier: CNN in PyTorch for plant disease detection.
+
+SKILLS
+Python, PyTorch, Gemini API, RAG, ChromaDB, Streamlit, machine learning

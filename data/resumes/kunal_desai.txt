@@ -1,0 +1,17 @@
+Kunal Desai
+kunal.desai@example.com
+
+EXPERIENCE
+Salesforce Administrator, Greenleaf Insurance (Jun 2021 - Present)
+- Built record-triggered flows and screen flows for claims intake.
+- Maintained profiles, permission sets, validation rules, reports and dashboards.
+- Wrote SOQL queries in Developer Console to audit data quality.
+
+SKILLS
+Salesforce Flows, SOQL, Data Loader, reports, permission sets
+
+CERTIFICATIONS
+Salesforce Administrator, Salesforce Platform App Builder
+
+EDUCATION
+BBA, Symbiosis, 2021

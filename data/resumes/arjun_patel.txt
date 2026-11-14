@@ -1,0 +1,13 @@
+Arjun Patel
+arjun.patel@example.com
+
+EXPERIENCE
+Senior Java Developer, Northgate Bank Systems (Jan 2020 - Present)
+- Built Spring Boot microservices with REST APIs and Oracle SQL.
+- Deployed services in Docker containers on AWS.
+
+SKILLS
+Java, Spring Boot, SQL, REST APIs, Docker, AWS, Kafka
+
+EDUCATION
+B.E. Electronics, Anna University, 2019

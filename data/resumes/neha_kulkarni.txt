@@ -1,0 +1,23 @@
+Neha Kulkarni
+neha.k@example.com
+
+EXPERIENCE
+Salesforce Developer, CloudNine Consulting (Mar 2023 - Present)
+- Built Apex trigger handlers and batch Apex for Sales Cloud opportunity roll-ups.
+- Developed Lightning Web Components (LWC) for a service console case dashboard.
+- Wrote complex SOQL with relationship queries and aggregate functions.
+- Automated lead routing with record-triggered flows and screen flows.
+- Integrated an ERP through Apex callouts with Named Credentials and Platform Events.
+- Configured an Agentforce service agent with custom topics and Apex actions.
+
+Salesforce Intern, CloudNine Consulting (Jun 2022 - Feb 2023)
+- Built reports, validation rules and simple Flows.
+
+CERTIFICATIONS
+Salesforce Platform Developer I, Agentforce Specialist
+
+SKILLS
+Apex, LWC, SOQL, Salesforce Flows, Agentforce, Platform Events, JavaScript
+
+EDUCATION
+B.E. Information Technology, Pune Institute of Computer Technology, 2022

@@ -1,0 +1,16 @@
+Rohit Sharma
+rohit.sharma@example.com
+
+EXPERIENCE
+Junior Developer, Pixelmint Studio (Aug 2024 - Present)
+- Maintain a Django web app and its SQL database (MySQL).
+- Fix bugs in templates and write small admin features in Python.
+
+PROJECTS
+Expense tracker: Flask app with SQLite storing personal expenses.
+
+SKILLS
+Python, Django, Flask, SQL, HTML, CSS
+
+EDUCATION
+B.Sc Computer Science, Osmania University, 2024

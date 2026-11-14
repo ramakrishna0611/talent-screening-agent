@@ -1,0 +1,21 @@
+Fatima Sheikh
+fatima.sheikh@example.com
+
+EXPERIENCE
+AI Engineer, Lumen Insights (Feb 2024 - Present)
+- Built a RAG assistant over 8,000 support articles with Python, the OpenAI API and pgvector.
+- Designed prompt engineering patterns and structured outputs for ticket triage (92% routing accuracy).
+- Created an evaluation set of 300 questions and used RAGAS and LLM-as-a-judge to track faithfulness.
+- Served the models behind FastAPI with streaming responses.
+
+Data Science Intern, Lumen Insights (Jul 2023 - Jan 2024)
+- Trained scikit-learn churn models and built pandas pipelines.
+
+PROJECTS
+Contract Q&A: LangChain agent with ChromaDB retrieval and citation checking.
+
+SKILLS
+Python, OpenAI API, Claude API, RAG, LangChain, ChromaDB, pgvector, prompt engineering, FastAPI, RAGAS
+
+EDUCATION
+M.Tech Artificial Intelligence, IIIT Hyderabad, 2023

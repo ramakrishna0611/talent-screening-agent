@@ -1,0 +1,24 @@
+Aarav Mehta
+aarav.mehta@example.com | +91 90000 11111
+
+SUMMARY
+Backend engineer with 4 years of experience building Python services.
+
+EXPERIENCE
+Senior Software Engineer, Quillstack Labs (Jan 2023 - Present)
+- Designed REST APIs in FastAPI serving 2M requests/day for a CRM product.
+- Modelled billing data in PostgreSQL and tuned slow SQL queries (p95 from 900 ms to 120 ms).
+- Containerised services with Docker and deployed them on AWS (ECS, S3); added Redis caching.
+
+Software Engineer, Brightline Retail Tech (Jul 2021 - Dec 2022)
+- Built a Django inventory service with REST endpoints and MySQL.
+- Wrote pytest suites and GitHub Actions pipelines.
+
+PROJECTS
+Rate-limit gateway: open-source FastAPI middleware with Redis token buckets.
+
+SKILLS
+Python, FastAPI, Django, SQL, PostgreSQL, REST APIs, Docker, AWS, Redis, pytest, Git
+
+EDUCATION
+B.Tech Computer Science, Vellore Institute of Technology, 2021

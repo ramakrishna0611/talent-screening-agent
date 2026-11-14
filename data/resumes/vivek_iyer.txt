@@ -1,0 +1,15 @@
+Vivek Iyer
+vivek.iyer@example.com
+
+EXPERIENCE
+Data Analyst, Tidewater Logistics (Apr 2022 - Present)
+- Wrote SQL on a 40 GB warehouse to track delivery SLAs.
+- Built Power BI dashboards used by the COO every week.
+- Automated monthly Excel reports with Python and pandas, saving 2 days per month.
+- Ran A/B testing analysis for a new pricing page.
+
+SKILLS
+SQL, Excel, Python, pandas, Power BI, statistics
+
+EDUCATION
+B.Com (Honours), Christ University, 2021

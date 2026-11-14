@@ -1,0 +1,13 @@
+Rakesh Verma
+rakesh.v@example.com
+
+EXPERIENCE
+Support Executive, Callwell BPO (Mar 2023 - Present)
+- Handled customer calls and updated tickets.
+
+SKILLS
+Python, FastAPI, Django, SQL, REST APIs, Docker, AWS, Redis, React, Apex, LWC, SOQL, RAG, LangChain, Power BI,
+Tableau, Excel, pandas, TypeScript, Next.js, machine learning, prompt engineering, OpenAI API
+
+EDUCATION
+B.A. Economics, Delhi University, 2022

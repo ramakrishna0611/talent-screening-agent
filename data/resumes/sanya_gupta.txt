@@ -1,0 +1,17 @@
+Sanya Gupta
+sanya.g@example.com
+
+EXPERIENCE
+Frontend Engineer, Orbitdesk (May 2022 - Present)
+- Built React and TypeScript components for a billing console used by 30k customers.
+- Migrated the marketing site to Next.js and improved Lighthouse performance from 61 to 94.
+- Wrote accessible HTML and CSS with Tailwind; added Jest and Playwright tests.
+
+Frontend Intern, Orbitdesk (Nov 2021 - Apr 2022)
+- Fixed UI bugs in JavaScript.
+
+SKILLS
+JavaScript, TypeScript, React, Next.js, HTML, CSS, Jest, Playwright
+
+EDUCATION
+B.E. Computer Engineering, Mumbai University, 2022
