@@ -11,12 +11,14 @@ from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import RateLimitError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
-from talent_screening.models import DECISIONS, Application, AuditLog, Job, Organization, Recruiter, make_session_factory
+from talent_screening import mailer
+from talent_screening.models import (DECISIONS, Application, AuditLog, Job, Organization, OutboundEmail, Recruiter,
+                                     make_session_factory)
 from talent_screening.parsing import UnsupportedFile
 from talent_screening.pipeline import screen
 from talent_screening.skills import display
@@ -76,9 +78,16 @@ class UserLogin(BaseModel):
     password: str
 
 
+class EmailIn(BaseModel):
+    send: bool = True
+    subject: str = Field(max_length=200)
+    body: str = Field(max_length=5000)
+
+
 class DecisionIn(BaseModel):
     decision: str
     note: str = ""
+    email: EmailIn | None = None          # shortlist / reject email reviewed by the recruiter
 
 
 def _check(pw: str, hashed: str) -> bool:
@@ -161,7 +170,28 @@ def application(app_id: int, user: Recruiter = Depends(current), db: Session = D
     a = own_application(db, user, app_id)
     return {**_row(a), "job": {"code": a.job.code, "title": a.job.title}, "email": a.candidate_email,
             "file_name": a.file_name, "breakdown": a.breakdown, "summary": a.summary, "flag_details": a.flags,
-            "profile": a.profile, "resume_text": a.resume_text, "routing": a.routing}
+            "profile": a.profile, "resume_text": a.resume_text, "routing": a.routing,
+            "emails": _emails(db, a.id)}
+
+
+def _emails(db: Session, app_id: int) -> list[dict]:
+    return [{"id": e.id, "kind": e.kind, "to": e.to_address, "subject": e.subject, "status": e.status,
+             "error": e.error, "at": e.created_at.strftime("%d %b %Y, %H:%M")}
+            for e in db.scalars(select(OutboundEmail).where(OutboundEmail.application_id == app_id)
+                                .order_by(OutboundEmail.id.desc()))]
+
+
+@app.get("/api/applications/{app_id}/email-preview")
+def email_preview(app_id: int, decision: str, user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    if decision not in mailer.EMAIL_KINDS:
+        raise HTTPException(400, "Emails exist only for shortlist and reject.")
+    a = own_application(db, user, app_id)
+    org = db.get(Organization, user.org_id)
+    draft = mailer.render(decision, candidate_name=a.candidate_name, title=a.job.title, code=a.job.code,
+                          org=org.name, recruiter=user.name)
+    already = [e for e in _emails(db, a.id) if e["kind"] == decision and e["status"] in ("SENT", "LOGGED")]
+    return {**draft, "to": a.candidate_email, "valid_to": bool(a.candidate_email and mailer.EMAIL_RE.match(a.candidate_email)),
+            "smtp": mailer.smtp_configured(), "already_sent": bool(already)}
 
 
 @app.post("/api/applications/{app_id}/decision")
@@ -174,7 +204,28 @@ def decide(app_id: int, body: DecisionIn, user: Recruiter = Depends(current), db
     db.add(AuditLog(org_id=user.org_id, actor_id=user.id, action="decision",
                     details={"application_id": a.id, "from": old, "to": body.decision, "note": body.note[:300]}))
     db.commit()
-    return {"ok": True, "decision": a.decision}
+
+    email_status = None
+    if body.email and body.email.send and body.decision in mailer.EMAIL_KINDS:
+        to = a.candidate_email or ""
+        if not mailer.EMAIL_RE.match(to):
+            email_status = {"status": "FAILED", "error": "The candidate has no valid email address."}
+        else:
+            record = OutboundEmail(org_id=user.org_id, application_id=a.id, kind=body.decision, to_address=to,
+                                   subject=body.email.subject.strip()[:200], body=body.email.body.strip(),
+                                   status="LOGGED", sent_by=user.id)
+            if mailer.smtp_configured():
+                try:
+                    mailer.send(to, record.subject, record.body, reply_to=user.email)
+                    record.status = "SENT"
+                except Exception as e:            # SMTP problems are reported, the decision itself stays saved
+                    record.status, record.error = "FAILED", f"{type(e).__name__}: {e}"[:300]
+            db.add(record)
+            db.add(AuditLog(org_id=user.org_id, actor_id=user.id, action="email_" + record.status.lower(),
+                            details={"application_id": a.id, "kind": record.kind, "to": to}))
+            db.commit()
+            email_status = {"status": record.status, "error": record.error}
+    return {"ok": True, "decision": a.decision, "email": email_status}
 
 
 @app.post("/api/jobs/{code}/upload")

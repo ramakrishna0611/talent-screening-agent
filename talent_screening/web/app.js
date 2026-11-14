@@ -143,6 +143,8 @@ async function openCard(id) {
       <div class="box"><h4>Gaps</h4>${list(s.gaps)}</div>
       <div class="box full"><h4>Ask in the interview</h4>${s.interview_questions && s.interview_questions.length ? `<ol>${s.interview_questions.map(q => `<li>${esc(q)}</li>`).join("")}</ol>` : '<p class="empty">Summary not generated yet.</p>'}</div>
     </div>
+    ${a.emails && a.emails.length ? `<div class="box full mails"><h4>Emails to the candidate</h4>${a.emails.map(m =>
+      `<div class="mail-row"><span>${esc(m.subject)}<br><span class="sub">${esc(m.to)} · ${esc(m.at)}${m.error ? " · " + esc(m.error) : ""}</span></span><span class="st ${m.status}">${m.status}</span></div>`).join("")}</div>` : ""}
     <div class="decide"><span class="meta">Score is computed by code; the AI only writes the summary. You decide.</span>
       <button class="btn ghost small" id="view-resume">View resume</button>
       ${["SHORTLISTED", "NEED_INFO", "REJECTED"].map(d => `<button class="btn small ${a.decision === d ? "on" : ""}" data-d="${d}">${{ SHORTLISTED: "Shortlist", NEED_INFO: "Need info", REJECTED: "Reject" }[d]}</button>`).join("")}
@@ -152,11 +154,54 @@ async function openCard(id) {
     $("#resume-text").textContent = $("body").classList.contains("blind") ? a.resume_text.replace(a.name, "[name hidden]") : a.resume_text;
     $("#resume-dialog").showModal();
   });
-  $$(".decide [data-d]").forEach(b => b.addEventListener("click", async () => {
-    await api(`/api/applications/${id}/decision`, { body: { decision: b.dataset.d } });
-    toast(`Marked as ${b.dataset.d.replace("_", " ").toLowerCase()}.`);
-    await Promise.all([loadJobs(), loadCands()]); openCard(id);
-  }));
+  $$(".decide [data-d]").forEach(b => b.addEventListener("click", () => decide(id, b.dataset.d)));
+}
+
+// ---------- decisions (shortlist / reject open an email preview first) ----------
+async function decide(id, decision) {
+  if (decision === "NEED_INFO") return saveDecision(id, { decision });
+  const p = await api(`/api/applications/${id}/email-preview?decision=${decision}`);
+  $("#mail-title").textContent = decision === "SHORTLISTED" ? "Shortlist and invite the candidate" : "Reject and notify the candidate";
+  $("#mail-to").value = p.to || "(no email address on the resume)";
+  $("#mail-subject").value = p.subject;
+  $("#mail-text").value = p.body;
+  const send = $("#mail-send");
+  send.checked = p.valid_to && !p.already_sent;
+  send.disabled = !p.valid_to;
+  const notes = [];
+  if (!p.valid_to) notes.push("No valid email address was found, so only the decision will be saved.");
+  if (p.already_sent) notes.push("This email was already sent once for this candidate; it is unticked to avoid a duplicate.");
+  if (p.valid_to && !p.smtp) notes.push("Email sending is not configured yet: the message will be stored in the outbox as LOGGED, not delivered.");
+  if (!notes.length) notes.push("Review and edit the message. It is sent only when you confirm.");
+  $("#mail-note").textContent = notes.join(" ");
+  $("#mail-note").classList.toggle("warn", notes.length > 1 || !p.valid_to || !p.smtp);
+  $("#mail-confirm").textContent = decision === "SHORTLISTED" ? "Shortlist" : "Reject";
+  $("#mail-dialog").dataset.id = id;
+  $("#mail-dialog").dataset.decision = decision;
+  $("#mail-dialog").showModal();
+}
+
+$("#mail-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const d = $("#mail-dialog");
+  const body = { decision: d.dataset.decision,
+                 email: { send: $("#mail-send").checked, subject: $("#mail-subject").value, body: $("#mail-text").value } };
+  d.close();
+  await saveDecision(+d.dataset.id, body);
+});
+$("#mail-cancel").addEventListener("click", () => $("#mail-dialog").close());
+$("#mail-close").addEventListener("click", () => $("#mail-dialog").close());
+
+async function saveDecision(id, body) {
+  try {
+    const r = await api(`/api/applications/${id}/decision`, { body });
+    let msg = `Marked as ${r.decision.replace("_", " ").toLowerCase()}.`;
+    if (r.email) msg += { SENT: " Email sent.", LOGGED: " Email saved to the outbox (sending not configured).",
+                          FAILED: ` Email failed: ${r.email.error}` }[r.email.status];
+    toast(msg, r.email && r.email.status === "FAILED");
+    await Promise.all([loadJobs(), loadCands()]);
+    openCard(id);
+  } catch (err) { toast(err.message, true); }
 }
 $("#close-resume").addEventListener("click", () => $("#resume-dialog").close());
 

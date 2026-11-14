@@ -1,0 +1,39 @@
+{
+ "KST-101:aarav_mehta": {
+  "one_line": "Strong Python backend experience with FastAPI, SQL, Docker, AWS and Redis; exceeds required years.",
+  "strengths": [
+   "Designed FastAPI REST APIs for a CRM product handling 2M daily requests (must‑have REST & FastAPI)",
+   "Modeled and optimized PostgreSQL queries, meeting SQL requirement",
+   "Containerised services with Docker and deployed on AWS, covering nice‑to‑have Docker/AWS",
+   "Implemented Redis caching and open‑source FastAPI middleware, matching nice‑to‑have Redis"
+  ],
+  "gaps": [
+   "Python listed but not explicitly demonstrated in work examples; job expects proven Python coding"
+  ],
+  "interview_questions": [
+   "Can you walk us through a Python codebase you authored for the FastAPI services?",
+   "How do you ensure Python code quality and testing in your current projects?",
+   "Describe a situation where you had to troubleshoot a Python‑specific performance issue."
+  ]
+ },
+ "KST-101:arjun_patel": {
+  "one_line": "Senior Java dev with 6.9 years, strong REST/SQL, but lacks Python/ FastAPI, limiting fit for backend role.",
+  "strengths": [
+   "6.9 years in relevant roles exceeding 2+ requirement",
+   "Experience building REST APIs with Spring Boot and Oracle SQL",
+   "Deployment in Docker on AWS",
+   "Strong SQL background"
+  ],
+  "gaps": [
+   "Missing Python and FastAPI/Django/Flask skills required for the role",
+   "No evidence of PostgreSQL usage",
+   "No demonstrated experience with Redis",
+   "No direct experience writing tests for Python APIs"
+  ],
+  "interview_questions": [
+   "Can you describe a project where you built and deployed a REST API using Python and FastAPI?",
+   "How have you handled database migrations and schema design in PostgreSQL in past projects?",
+   "What testing frameworks have you used for backend services, and how did you integrate them into your CI/CD pipeline?"
+  ]
+ }
+}

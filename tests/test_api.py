@@ -94,3 +94,45 @@ def test_decision_and_isolation(client):
 
 def test_frontend_served(client):
     assert "Sieve" in client.get("/").text
+
+
+def test_shortlist_preview_and_email_logged_without_smtp(client, monkeypatch):
+    monkeypatch.delenv("SMTP_USER", raising=False)
+    login(client)
+    app_id = next(r["id"] for r in client.get("/api/jobs/KST-101/applications").json() if r["name"] == "Aarav Mehta")
+    p = client.get(f"/api/applications/{app_id}/email-preview?decision=SHORTLISTED").json()
+    assert p["to"] == "aarav.mehta@example.com" and "Hi Aarav" in p["body"] and not p["smtp"]
+    r = client.post(f"/api/applications/{app_id}/decision",
+                    json={"decision": "SHORTLISTED", "email": {"send": True, "subject": p["subject"], "body": p["body"]}}).json()
+    assert r["email"]["status"] == "LOGGED"
+    card = client.get(f"/api/applications/{app_id}").json()
+    assert card["decision"] == "SHORTLISTED" and card["emails"][0]["kind"] == "SHORTLISTED"
+    assert client.get(f"/api/applications/{app_id}/email-preview?decision=SHORTLISTED").json()["already_sent"]
+
+
+def test_reject_email_sent_through_smtp(client, monkeypatch):
+    sent = []
+    monkeypatch.setenv("SMTP_USER", "kestrel.careers.demo@gmail.com")
+    monkeypatch.setenv("SMTP_PASSWORD", "app-password")
+    monkeypatch.setattr(api.mailer, "send", lambda to, subject, body, reply_to=None: sent.append((to, subject)) or "<id>")
+    login(client)
+    app_id = next(r["id"] for r in client.get("/api/jobs/KST-101/applications").json() if r["name"] == "Arjun Patel")
+    r = client.post(f"/api/applications/{app_id}/decision",
+                    json={"decision": "REJECTED", "email": {"send": True, "subject": "Your application", "body": "Thanks"}}).json()
+    assert r["email"]["status"] == "SENT" and sent == [("arjun.patel@example.com", "Your application")]
+
+
+def test_no_email_when_unticked_and_none_for_need_info(client):
+    login(client)
+    app_id = client.get("/api/jobs/KST-101/applications").json()[0]["id"]
+    r = client.post(f"/api/applications/{app_id}/decision",
+                    json={"decision": "REJECTED", "email": {"send": False, "subject": "x", "body": "y"}}).json()
+    assert r["email"] is None
+    assert client.get(f"/api/applications/{app_id}/email-preview?decision=NEED_INFO").status_code == 400
+
+
+def test_rejection_template_has_no_score():
+    from talent_screening.mailer import render
+    m = render("REJECTED", candidate_name="Arjun Patel", title="Backend Engineer", code="KST-101",
+               org="Kestrel Systems", recruiter="Priya Nair")
+    assert m["body"].startswith("Hi Arjun,") and "score" not in m["body"].lower()

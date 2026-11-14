@@ -78,6 +78,22 @@ class EmailLog(Base):
     received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 
+class OutboundEmail(Base):
+    """Every email to a candidate, sent or (without SMTP configured) only logged."""
+    __tablename__ = "outbound_emails"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    org_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
+    application_id: Mapped[int] = mapped_column(ForeignKey("applications.id"))
+    kind: Mapped[str] = mapped_column(String(20))                 # SHORTLISTED or REJECTED
+    to_address: Mapped[str] = mapped_column(String(200))
+    subject: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(10))               # SENT, LOGGED or FAILED
+    error: Mapped[str | None] = mapped_column(String(300))
+    sent_by: Mapped[int | None] = mapped_column(ForeignKey("recruiters.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+
 class AuditLog(Base):
     __tablename__ = "audit_log"
     id: Mapped[int] = mapped_column(primary_key=True)

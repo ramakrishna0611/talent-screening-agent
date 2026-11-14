@@ -94,6 +94,23 @@
   <pre id="resume-text"></pre>
 </dialog>
 
+<dialog id="mail-dialog" class="mail-dialog">
+  <form id="mail-form" method="dialog">
+    <div class="dialog-head"><h3 id="mail-title">Email the candidate</h3><button class="icon-btn" type="button" id="mail-close" aria-label="Close">×</button></div>
+    <div class="mail-body">
+      <p class="mail-note" id="mail-note"></p>
+      <label class="field">To<input id="mail-to" readonly></label>
+      <label class="field">Subject<input id="mail-subject" maxlength="200" required></label>
+      <label class="field">Message<textarea id="mail-text" rows="12" maxlength="5000" required></textarea></label>
+      <label class="check"><input type="checkbox" id="mail-send" checked> Send this email</label>
+    </div>
+    <div class="row-btns mail-actions">
+      <button class="btn ghost" type="button" id="mail-cancel">Cancel</button>
+      <button class="btn ink" type="submit" id="mail-confirm">Confirm</button>
+    </div>
+  </form>
+</dialog>
+
 <div id="toasts" class="toasts" aria-live="polite"></div>
 <script src="/static/app.js"></script>
 </body>

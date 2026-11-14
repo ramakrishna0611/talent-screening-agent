@@ -168,3 +168,19 @@ details summary { cursor: pointer; font-size: 13px; color: var(--accent); margin
   .layout > .panel { display: none; } .layout > .panel.show { display: block; }
   .cols { grid-template-columns: 1fr; } .sc-head { grid-template-columns: 84px 1fr; } .dial { width: 84px; height: 84px; }
 }
+
+/* ---------- email preview ---------- */
+.mail-dialog { border: 1px solid var(--rule); border-radius: 14px; background: var(--card); color: var(--ink); width: min(640px, calc(100vw - 32px)); padding: 0; }
+.mail-dialog::backdrop { background: rgba(20,19,15,.55); }
+.mail-body { padding: 12px 16px; display: grid; gap: 10px; }
+.field { display: grid; gap: 4px; font: 12px var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.field input, .field textarea { font: 14.5px/1.5 var(--body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; text-transform: none; letter-spacing: 0; resize: vertical; }
+.field input[readonly] { opacity: .8; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.mail-note { margin: 0; font-size: 13.5px; padding: 8px 10px; border-radius: 8px; background: var(--accent-soft); }
+.mail-note.warn { background: var(--mid-soft); }
+.mail-actions { padding: 0 16px 16px; }
+.mails { margin-top: 12px; }
+.mail-row { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--rule); }
+.mail-row .st { font: 600 10px var(--mono); letter-spacing: .1em; padding: 2px 6px; border-radius: 4px; border: 1.5px solid currentColor; }
+.st.SENT { color: var(--good); } .st.LOGGED { color: var(--muted); } .st.FAILED { color: var(--low); }
