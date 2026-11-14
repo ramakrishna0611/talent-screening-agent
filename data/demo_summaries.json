@@ -216,5 +216,23 @@
    "What experience do you have building interactive dashboards in Power BI or Tableau, or how would you approach learning them?",
    "Tell us about a project where you used pandas or Python for data manipulation beyond basic scripting."
   ]
+ },
+ "KST-105:sanya_gupta": {
+  "one_line": "Strong React and TypeScript candidate with Next.js and testing experience matching all job requirements.",
+  "strengths": [
+   "Demonstrated React and TypeScript skills by building components for a billing console at Orbitdesk.",
+   "Possesses Next.js experience, evidenced by migrating a marketing site and improving Lighthouse performance.",
+   "Includes frontend testing in workflow, having added Jest and Playwright tests to the codebase.",
+   "Meets the minimum experience requirement with 4.8 years in relevant frontend roles."
+  ],
+  "gaps": [
+   "No specific evidence of owning a customer console, though similar billing console work is present.",
+   "No standalone projects listed to verify skills outside of the primary employment context."
+  ],
+  "interview_questions": [
+   "Describe the specific accessibility challenges you faced when writing HTML and CSS for the billing console.",
+   "How did you structure your Jest and Playwright tests to ensure reliable automated UI coverage?",
+   "What was your role in the Next.js migration, and how did you measure the performance improvements?"
+  ]
  }
 }

@@ -15,7 +15,9 @@ DB_URL = os.getenv("DB_URL", f"sqlite:///{ROOT / 'talent.db'}")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
-FALLBACK_MODEL = os.getenv("FALLBACK_MODEL", "openai/gpt-oss-20b")
+# Tried in order when the main model is rate-limited; on Groq each model has its own daily token allowance
+FALLBACK_MODELS = [m.strip() for m in os.getenv("FALLBACK_MODELS", "openai/gpt-oss-20b,qwen/qwen3.8-27b").split(",")
+                   if m.strip()]
 
 # Default rubric weights (out of 100); HR can override per job
 DEFAULT_WEIGHTS = {"must_have": 40, "experience": 20, "nice_to_have": 15, "applied": 25}

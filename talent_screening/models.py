@@ -1,7 +1,7 @@
 """Database tables (SQLAlchemy 2.0)."""
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 from talent_screening.config import DB_URL
@@ -82,6 +82,7 @@ class EmailLog(Base):
     file_name: Mapped[str | None] = mapped_column(String(200))
     resume_text: Mapped[str | None] = mapped_column(Text)               # kept only while waiting for routing
     application_ids: Mapped[list] = mapped_column(JSON, default=list)
+    seen_by_hr: Mapped[bool] = mapped_column(Boolean, default=False)    # HR has acknowledged this arrival
     received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 

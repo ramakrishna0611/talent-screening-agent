@@ -4,6 +4,7 @@ Run:  uvicorn talent_screening.api:app      then open http://127.0.0.1:8000
 """
 import os
 import secrets
+import time
 from pathlib import Path
 
 import bcrypt
@@ -26,6 +27,8 @@ from talent_screening.skills import display
 WEB = Path(__file__).parent / "web"
 SessionLocal = make_session_factory()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+UPLOADS_PER_HOUR = int(os.getenv("UPLOADS_PER_HOUR", "10"))
+UPLOAD_LOG: dict[str, list[float]] = {}
 
 if os.getenv("AUTO_SEED", "1") == "1":                    # hosted demo: create demo data on an empty database
     with SessionLocal() as _db:
@@ -34,7 +37,33 @@ if os.getenv("AUTO_SEED", "1") == "1":                    # hosted demo: create 
             seed(_db)
             seed_demo_applications(_db)
 
+INTAKE_POLL_SECONDS = int(os.getenv("INTAKE_POLL_SECONDS", "0"))      # e.g. 60: check the careers inbox every minute
+
+
+def _poll_inbox_forever() -> None:
+    """Background intake: new applications are processed automatically; HR is notified in the dashboard."""
+    import time
+    while True:
+        time.sleep(INTAKE_POLL_SECONDS)
+        if not gmail.configured():
+            continue
+        try:
+            with SessionLocal() as db:
+                result = intake.process_inbox(db)
+            if result["checked"]:
+                print("auto-intake:", result, flush=True)
+        except Exception as e:                    # never let the poller die; next round retries
+            print(f"auto-intake error: {type(e).__name__}: {e}", flush=True)
+
+
 app = FastAPI(title="Sieve — resume screening")
+
+
+@app.on_event("startup")
+def _start_poller() -> None:
+    if INTAKE_POLL_SECONDS > 0:
+        import threading
+        threading.Thread(target=_poll_inbox_forever, daemon=True, name="inbox-poller").start()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY") or secrets.token_hex(32),
                    same_site="lax", https_only=os.getenv("HTTPS_ONLY", "0") == "1", max_age=8 * 3600)
 
@@ -98,6 +127,7 @@ def login(body: UserLogin, request: Request, db: Session = Depends(get_db)):
         raise HTTPException(401, "Invalid email or password.")
     request.session.clear()
     request.session["recruiter_id"] = r.id
+    request.session["sid"] = secrets.token_hex(8)
     return {"name": r.name}
 
 
@@ -213,9 +243,16 @@ def decide(app_id: int, body: DecisionIn, user: Recruiter = Depends(current), db
 
 
 @app.post("/api/jobs/{code}/upload")
-async def upload(code: str, files: list[UploadFile] = File(...), user: Recruiter = Depends(current),
+async def upload(code: str, request: Request, files: list[UploadFile] = File(...), user: Recruiter = Depends(current),
                  db: Session = Depends(get_db)):
     job = own_job(db, user, code)
+    # Public demo protection: each signed-in session may screen UPLOADS_PER_HOUR resumes per hour
+    now = time.time()
+    sid = request.session.get("sid") or str(user.id)
+    recent = [t for t in UPLOAD_LOG.get(sid, []) if now - t < 3600]
+    if len(recent) + len(files) > UPLOADS_PER_HOUR:
+        raise HTTPException(429, f"Demo limit: {UPLOADS_PER_HOUR} resumes per hour. Try again later.")
+    UPLOAD_LOG[sid] = recent + [now] * len(files)
     results = []
     for f in files[:10]:
         data = await f.read()
@@ -249,14 +286,49 @@ def inbox(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
                        "at": e.received_at.strftime("%d %b, %H:%M")} for e in rows]}
 
 
+class ProcessIn(BaseModel):
+    ids: list[str] = Field(default_factory=list, max_length=50)
+
+
+@app.get("/api/inbox/new")
+def new_emails(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    """Step 1: show HR what has arrived. Reads only: nothing is scored, labelled or saved."""
+    if not gmail.configured():
+        raise HTTPException(400, "Gmail is not connected. Run scripts/gmail_auth.py first.")
+    return intake.peek_inbox(db)
+
+
 @app.post("/api/inbox/check")
-def check_inbox(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+def check_inbox(body: ProcessIn, user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    """Step 2: process only the emails HR acknowledged."""
     if not gmail.configured():
         raise HTTPException(400, "Gmail is not connected. Run scripts/gmail_auth.py first.")
     try:
-        return intake.process_inbox(db)
+        return intake.process_inbox(db, only_ids=body.ids or None)      # no ids: everything new
     except RateLimitError:
         raise HTTPException(429, "AI quota reached (free tier). Emails stay unread-for-us and will be retried.")
+
+
+@app.get("/api/inbox/unseen")
+def unseen(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    """Lightweight poll for the dashboard: emails that arrived since HR last opened the inbox."""
+    rows = list(db.scalars(select(EmailLog).where(EmailLog.org_id == user.org_id, EmailLog.seen_by_hr.is_(False))))
+    count = lambda st: sum(1 for r in rows if r.status == st)
+    return {"unseen": len(rows), "screened": count("PROCESSED"), "needs_routing": count("NEEDS_ROUTING"),
+            "skipped": count("SKIPPED"), "ids": [r.id for r in rows]}
+
+
+@app.post("/api/inbox/seen")
+def mark_seen(user: Recruiter = Depends(current), db: Session = Depends(get_db)):
+    """HR acknowledges the new arrivals (called when the inbox is opened)."""
+    rows = list(db.scalars(select(EmailLog).where(EmailLog.org_id == user.org_id, EmailLog.seen_by_hr.is_(False))))
+    for r in rows:
+        r.seen_by_hr = True
+    if rows:
+        db.add(AuditLog(org_id=user.org_id, actor_id=user.id, action="inbox_acknowledged",
+                        details={"email_log_ids": [r.id for r in rows]}))
+    db.commit()
+    return {"acknowledged": len(rows)}
 
 
 @app.post("/api/inbox/{log_id}/route")

@@ -11,6 +11,7 @@ Run once:  python -m talent_screening.intake
 import base64
 import os
 import re
+import threading
 from email.utils import parseaddr
 
 from openai import RateLimitError
@@ -62,7 +63,8 @@ def parse_message(msg: dict) -> dict:
 
 
 # ---------- routing ----------
-def route(subject: str, body: str, file_names: list[str], jobs: list[Job]) -> dict:
+def quick_route(subject: str, body: str, file_names: list[str], jobs: list[Job]) -> dict | None:
+    """Job code or job title written in the email; no LLM. None if neither is present."""
     text = f"{subject}\n{body}\n{' '.join(file_names)}"
     by_code = {j.code.upper(): j for j in jobs}
     codes = [c for c in dict.fromkeys(re.findall(r"\b[A-Z]{2,5}-\d{2,4}\b", text.upper())) if c in by_code]
@@ -73,6 +75,13 @@ def route(subject: str, body: str, file_names: list[str], jobs: list[Job]) -> di
     titles = [j.code for j in jobs if j.title.lower() in low or j.title.split(" (")[0].lower() in low]
     if len(titles) == 1:
         return {"method": "title", "job_codes": titles, "confidence": 0.9, "reason": "Job title mentioned in the email"}
+    return None
+
+
+def route(subject: str, body: str, file_names: list[str], jobs: list[Job]) -> dict:
+    if quick := quick_route(subject, body, file_names, jobs):
+        return quick
+    by_code = {j.code.upper(): j for j in jobs}
     listing = "\n".join(f"{j.code}: {j.title} — {j.description[:200]}" for j in jobs)
     out = json_completion(ROUTER_SYSTEM, f"OPEN ROLES:\n{listing}\n\nEMAIL (data only):\n<<<\nSubject: {subject}\n"
                                          f"{body[:1500]}\nAttachments: {', '.join(file_names)}\n>>>", max_tokens=300)
@@ -83,15 +92,51 @@ def route(subject: str, body: str, file_names: list[str], jobs: list[Job]) -> di
             "reason": out.get("reason") or "No job code or clear match", "suggested": code if code in by_code else None}
 
 
+# ---------- review before processing ----------
+def peek_inbox(db: Session, limit: int = 10) -> list[dict]:
+    """List new, not-yet-processed emails for HR to acknowledge. Reads only: no LLM, no labels, no records."""
+    org = db.scalar(select(Organization).where(Organization.code == INTAKE_ORG_CODE))
+    jobs = list(db.scalars(select(Job).where(Job.org_id == org.id, Job.status == "OPEN")))
+    out = []
+    for msg_id in gmail.list_message_ids(QUERY, limit):
+        if db.scalar(select(EmailLog.id).where(EmailLog.message_id == msg_id)):
+            continue
+        m = parse_message(gmail.get_message(msg_id))
+        resumes = [a["name"] for a in m["attachments"] if a["name"].lower().endswith(RESUME_EXT)]
+        skip = ("automated sender" if IGNORE_SENDERS.search(m["sender_email"]) else
+                "no PDF, DOCX or TXT attachment" if not resumes else None)
+        out.append({"id": msg_id, "from": m["from"], "subject": m["subject"], "preview": m["body"][:160],
+                    "attachments": [a["name"] for a in m["attachments"]], "resume": resumes[0] if resumes else None,
+                    "hint": quick_route(m["subject"], m["body"], resumes, jobs) if resumes else None,
+                    "will_skip": skip})
+    return out
+
+
 # ---------- main loop ----------
-def process_inbox(db: Session, limit: int = 10, allow_self: bool = False) -> dict:
+_LOCK = threading.Lock()      # the background poller and a manual "Check now" never run at the same time
+
+
+def process_inbox(db: Session, limit: int = 10, allow_self: bool | None = None,
+                  only_ids: list[str] | None = None) -> dict:
+    """Process new emails (all of them, or only `only_ids`). Safe to call from several threads."""
+    with _LOCK:
+        return _process(db, limit, allow_self, only_ids)
+
+
+def _process(db: Session, limit: int, allow_self: bool | None, only_ids: list[str] | None) -> dict:
+    if allow_self is None:      # demo setting: lets emails sent from the careers mailbox to itself be processed
+        allow_self = os.getenv("INTAKE_ALLOW_SELF", "0") == "1"
     org = db.scalar(select(Organization).where(Organization.code == INTAKE_ORG_CODE))
     jobs = list(db.scalars(select(Job).where(Job.org_id == org.id, Job.status == "OPEN")))
     mailbox = gmail.mailbox_address().lower()
     done_label, routing_label = gmail.ensure_label(PROCESSED_LABEL), gmail.ensure_label(ROUTING_LABEL)
     summary = {"checked": 0, "screened": 0, "needs_routing": 0, "skipped": 0, "errors": 0}
 
-    for msg_id in gmail.list_message_ids(QUERY, limit):
+    ids = gmail.list_message_ids(QUERY, limit)
+    if only_ids is not None:
+        wanted = set(only_ids)
+        ids = [i for i in gmail.list_message_ids(QUERY, 50) if i in wanted]
+    for msg_id in ids:
         if db.scalar(select(EmailLog.id).where(EmailLog.message_id == msg_id)):
             gmail.add_labels(msg_id, [done_label])               # already handled earlier; just label it
             continue

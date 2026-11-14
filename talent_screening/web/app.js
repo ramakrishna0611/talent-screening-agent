@@ -21,7 +21,7 @@ function toast(msg, bad = false) {
 }
 
 // ---------- theme + blind mode ----------
-const theme = () => document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+const theme = () => document.documentElement.dataset.theme || "light";      // bright by default; dark only on request
 if (!document.documentElement.dataset.theme) document.documentElement.dataset.theme = theme();
 $$(".theme-btn").forEach(b => b.addEventListener("click", () => {
   const next = theme() === "dark" ? "light" : "dark";
@@ -51,7 +51,7 @@ async function boot() {
   $("#org").textContent = state.me.org; $("#who").textContent = state.me.name;
   await loadJobs();
   if (!state.job && state.jobs.length) selectJob(state.jobs[0].code);
-  loadInbox().catch(() => {});
+  pollArrivals();
 }
 
 async function loadJobs() {
@@ -217,9 +217,8 @@ const ROUTE_LABEL = { job_code: "job code in email", title: "job title in email"
                       manual: "routed by you", needs_routing: "needs routing" };
 async function loadInbox() {
   const d = await api("/api/inbox");
-  const waiting = d.items.filter(i => i.status === "NEEDS_ROUTING").length;
-  $("#inbox-badge").hidden = !waiting; $("#inbox-badge").textContent = waiting;
-  $("#inbox-status").textContent = d.connected ? "Gmail connected." : "Gmail is not connected (run scripts/gmail_auth.py).";
+  $("#inbox-status").textContent = d.connected ? "Gmail connected · new emails are processed automatically every minute."
+                                              : "Gmail is not connected (run scripts/gmail_auth.py).";
   $("#inbox-check").disabled = !d.connected;
   const jobOptions = state.jobs.map(j => `<option value="${j.code}">${esc(j.code)} · ${esc(j.title)}</option>`).join("");
   $("#inbox-list").innerHTML = d.items.length ? d.items.map(i => {
@@ -241,9 +240,31 @@ async function loadInbox() {
     catch (err) { toast(err.message, true); b.disabled = false; b.textContent = "Screen for this role"; }
   }));
 }
-$("#inbox-btn").addEventListener("click", async () => { await loadInbox(); $("#inbox-dialog").showModal(); });
+$("#inbox-btn").addEventListener("click", async () => {
+  await loadInbox(); $("#inbox-dialog").showModal();
+  await api("/api/inbox/seen", { body: {} });          // HR has now seen (acknowledged) the new arrivals
+  lastUnseen = 0; $("#inbox-badge").hidden = true;
+});
+
+// Automatic intake runs on the server; the dashboard only listens for new arrivals and tells HR.
+let lastUnseen = 0;
+async function pollArrivals() {
+  if ($("#app").hidden) return;
+  try {
+    const u = await api("/api/inbox/unseen");
+    $("#inbox-badge").hidden = !u.unseen; $("#inbox-badge").textContent = u.unseen;
+    if (u.unseen > lastUnseen) {
+      toast(`📬 ${u.unseen} new application email${u.unseen > 1 ? "s" : ""} received: ${u.screened} screened` +
+            (u.needs_routing ? `, ${u.needs_routing} need routing` : "") + (u.skipped ? `, ${u.skipped} skipped` : "") +
+            ". Open Inbox to review.");
+      await loadJobs(); if (state.job) loadCands();
+    }
+    lastUnseen = u.unseen;
+  } catch (e) { /* signed out or offline: try again next round */ }
+}
+setInterval(pollArrivals, 20000);
 $("#inbox-close").addEventListener("click", () => $("#inbox-dialog").close());
-$("#inbox-check").addEventListener("click", async () => {
+$("#inbox-check").addEventListener("click", async () => {      // optional: don't wait for the next automatic round
   const b = $("#inbox-check"); b.disabled = true; b.textContent = "Checking…";
   try {
     const s = await api("/api/inbox/check", { body: {} });

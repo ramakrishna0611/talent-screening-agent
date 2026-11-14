@@ -1,19 +1,11 @@
 /* Sieve. — editorial look shared with "Away.", deep-green accent */
 :root {
-  --paper: #f4efe6; --paper-2: #ebe3d4; --card: #fbf8f2; --ink: #1c1a16; --muted: #6e675a; --rule: #d9cfbd;
+  --paper: #f7f6f2; --paper-2: #eceae3; --card: #ffffff; --ink: #191917; --muted: #66645c; --rule: #e0ddd4;
   --accent: #1f5a46; --accent-soft: #dcebe3; --good: #2f7a4f; --mid: #b98a12; --low: #c8452a;
   --good-soft: #dfeee3; --mid-soft: #f3e6c2; --low-soft: #f6ddd5; --on-accent: #ffffff;
   --shadow: 0 1px 0 rgba(28,26,22,.06), 0 10px 30px -18px rgba(28,26,22,.35);
   --display: "Fraunces", Georgia, serif; --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", Consolas, monospace; color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #14130f; --paper-2: #1f1c16; --card: #1b1914; --ink: #ede6d8; --muted: #a59b88; --rule: #39332a;
-    --accent: #7cc4a4; --accent-soft: #1d3329; --good: #8cc191; --mid: #e2b647; --low: #ee7c62;
-    --good-soft: #213325; --mid-soft: #3a3016; --low-soft: #3d221b; --on-accent: #14130f; color-scheme: dark;
-    --shadow: 0 10px 30px -18px rgba(0,0,0,.8);
-  }
 }
 :root[data-theme="dark"] {
   --paper: #14130f; --paper-2: #1f1c16; --card: #1b1914; --ink: #ede6d8; --muted: #a59b88; --rule: #39332a;
@@ -24,7 +16,7 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--body); min-height: 100vh;
-  background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 3px 3px; }
+   }
 [hidden] { display: none !important; }
 h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
 code, .mono { font-family: var(--mono); }

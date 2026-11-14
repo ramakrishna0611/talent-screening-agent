@@ -1,0 +1,23 @@
+# Render Blueprint: New > Blueprint > pick this repo, then paste a Groq API key when asked.
+# Email intake and sending stay off on the public demo (no Gmail token is configured there).
+services:
+  - type: web
+    name: sieve-resume-screening
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn talent_screening.api:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: GROQ_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: HTTPS_ONLY
+        value: "1"
+      - key: INTAKE_POLL_SECONDS
+        value: "0"
+      - key: UPLOADS_PER_HOUR
+        value: "10"
