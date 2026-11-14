@@ -2,6 +2,8 @@
 
 Sieve reads every resume, scores it against a specific job and explains each point with a quote from the resume, so an HR team can shortlist faster and more fairly. Resumes arrive by **upload or straight from a careers Gmail inbox**; HR reviews a ranked list, opens an evidence-backed scorecard and shortlists or rejects with a reviewed email to the candidate.
 
+**Live demo: https://sieve-resume-screening.onrender.com** — sign in as `priya@kestrel.test` / `Welcome@123` (free hosting sleeps when idle; the first load can take about a minute).
+
 > The score is computed by code. The AI only structures the resume and writes the summary. A human makes every decision.
 
 ![Dashboard](docs/dashboard.png)
