@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sieve · Resume Screening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/app.css">
+<script>try{var t=localStorage.getItem("sieve-theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231f5a46'/><text x='16' y='23' font-size='19' text-anchor='middle' fill='%23f4efe6' font-family='Georgia' font-weight='700'>S</text></svg>">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section id="login" class="login" hidden>
+  <button class="icon-btn theme-btn login-theme" type="button" aria-label="Switch dark or light mode" title="Dark / light mode"><span class="sun">☀</span><span class="moon">☾</span></button>
+  <div class="hero">
+    <div class="brand-xl">Sieve<span>.</span></div>
+    <p class="tagline">Every resume read, scored against the job and explained with evidence &mdash; so recruiters decide, faster and fairer.</p>
+    <ul class="points">
+      <li><b>Scores computed by code</b>, each point tied to a quote from the resume</li>
+      <li><b>Name-blind review</b> and no protected attributes in scoring</li>
+      <li><b>Prompt-injection resistant</b>: hidden instructions in a resume change nothing</li>
+    </ul>
+    <div class="stub">
+      <div class="stub-head">Demo credentials</div>
+      <div class="stub-row"><span>Kestrel Systems</span><code>KSTL01 · kestrel@2026 · priya@kestrel.test</code></div>
+      <div class="stub-row"><span>Saffron Cloudworks</span><code>SAFR02 · saffron@2026 · rahul@saffron.test</code></div>
+      <div class="stub-row"><span>Recruiter password</span><code>Welcome@123</code></div>
+    </div>
+  </div>
+  <div class="card login-card">
+    <div class="steps"><b id="s1" class="on">1 · Company</b><b id="s2">2 · Recruiter</b></div>
+    <form id="org-form" class="form">
+      <label>Company code<input name="code" required placeholder="KSTL01" autocomplete="off"></label>
+      <label>Company password<input name="password" type="password" required></label>
+      <button class="btn ink" type="submit">Continue →</button>
+    </form>
+    <form id="user-form" class="form" hidden>
+      <div class="org-chosen" id="org-chosen"></div>
+      <label>Recruiter email<input name="email" type="email" required placeholder="priya@kestrel.test"></label>
+      <label>Password<input name="password" type="password" required></label>
+      <div class="row-btns"><button class="btn ghost" type="button" id="back">← Back</button><button class="btn ink" type="submit">Sign in</button></div>
+    </form>
+    <p class="error" id="login-error" role="alert"></p>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<section id="app" class="app" hidden>
+  <header class="topbar">
+    <div class="brand">Sieve<span>.</span></div>
+    <span id="org" class="org"></span>
+    <div class="top-right">
+      <label class="switch" title="Hide candidate names while reviewing">
+        <input type="checkbox" id="blind"><span class="track"><i></i></span>Blind review
+      </label>
+      <button class="icon-btn theme-btn" type="button" aria-label="Switch dark or light mode" title="Dark / light mode"><span class="sun">☀</span><span class="moon">☾</span></button>
+      <span id="who" class="who"></span>
+      <button id="logout" class="btn ghost small">Sign out</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"><button data-tab="jobs" class="on">Jobs</button><button data-tab="cands">Candidates</button><button data-tab="card">Scorecard</button></nav>
+
+  <main class="layout">
+    <aside class="panel jobs" data-pane="jobs">
+      <h2>Open roles</h2>
+      <div id="jobs"></div>
+    </aside>
+
+    <section class="panel cands" data-pane="cands">
+      <div class="head">
+        <div><h2 id="job-title">Candidates</h2><div class="sub" id="job-meta"></div></div>
+      </div>
+      <label class="drop" id="drop">
+        <input type="file" id="file" multiple accept=".pdf,.docx,.txt">
+        <b>Drop resumes here</b> or click to upload <span class="sub">PDF, DOCX or TXT · up to 10 at once</span>
+      </label>
+      <div class="filters" id="filters"></div>
+      <div id="cands" class="cand-list"></div>
+    </section>
+
+    <section class="panel card-pane" data-pane="card">
+      <div id="card" class="scorecard"><p class="empty">Select a candidate to see the scorecard.</p></div>
+    </section>
+  </main>
+</section>
+
+<dialog id="resume-dialog" class="resume-dialog">
+  <div class="dialog-head"><h3 id="resume-title">Resume</h3><button class="icon-btn" id="close-resume" aria-label="Close">×</button></div>
+  <pre id="resume-text"></pre>
+</dialog>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

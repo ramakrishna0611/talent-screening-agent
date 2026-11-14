@@ -65,12 +65,62 @@ def seed(db: Session) -> None:
     db.commit()
 
 
+# Which sample candidates applied to which job (fictional)
+DEMO_APPLICATIONS = {
+    "KST-101": ["aarav_mehta", "arjun_patel", "rohit_sharma", "keyword_stuffer", "injection_attempt"],
+    "KST-102": ["neha_kulkarni", "kunal_desai"],
+    "KST-103": ["fatima_sheikh", "meghana_rao", "keyword_stuffer"],
+    "SAF-201": ["vivek_iyer", "rohit_sharma"],
+    "SAF-202": ["sanya_gupta"],
+}
+
+
+def seed_demo_applications(db: Session, today=None) -> int:
+    """Create applications from pre-extracted profiles (data/demo_profiles.json), so the demo needs no LLM calls.
+    Scores are computed by the normal scoring code; summaries come from data/demo_summaries.json if present."""
+    import json
+    from talent_screening.config import DATA
+    from talent_screening.extract import Profile
+    from talent_screening.models import Application
+    from talent_screening.parsing import suspicious_phrases
+    from talent_screening.scoring import score
+
+    profiles = json.loads((DATA / "demo_profiles.json").read_text(encoding="utf-8"))
+    sums_path = DATA / "demo_summaries.json"
+    summaries = json.loads(sums_path.read_text(encoding="utf-8")) if sums_path.exists() else {}
+    n = 0
+    for code, names in DEMO_APPLICATIONS.items():
+        job = db.query(Job).filter_by(code=code).one()
+        for name in names:
+            text = (DATA / "resumes" / f"{name}.txt").read_text(encoding="utf-8")
+            profile = Profile.model_validate(profiles[name])
+            breakdown = score(profile, text, job, today)
+            flags = []
+            if phrases := suspicious_phrases(text):
+                flags.append({"type": "possible_prompt_injection", "examples": phrases,
+                              "message": "The resume contains text that tries to instruct an AI screener. "
+                                         "It had no effect on the score, which is computed by code."})
+            if breakdown["missing_must_have"]:
+                flags.append({"type": "missing_must_have",
+                              "message": "Missing required: " + ", ".join(breakdown["missing_must_have"])})
+            db.add(Application(org_id=job.org_id, job_id=job.id, candidate_name=profile.name,
+                               candidate_email=profile.email, source="demo", file_name=f"{name}.txt",
+                               resume_text=text, profile=profile.model_dump(), score=breakdown["score"],
+                               breakdown=breakdown, summary=summaries.get(f"{code}:{name}", {}), flags=flags))
+            n += 1
+    db.commit()
+    return n
+
+
 def main() -> None:
     engine = create_engine(DB_URL)
     Base.metadata.drop_all(engine)
     with make_session_factory(DB_URL)() as db:
         seed(db)
-    print("Seeded 2 companies, 5 open jobs. Recruiters: priya@kestrel.test, rahul@saffron.test / " + PASSWORD)
+        n = seed_demo_applications(db)
+    print(f"Seeded 2 companies, 5 open jobs, {n} demo applications. "
+          "Recruiters: priya@kestrel.test (KSTL01 / kestrel@2026), rahul@saffron.test (SAFR02 / saffron@2026), "
+          "password " + PASSWORD)
 
 
 if __name__ == "__main__":

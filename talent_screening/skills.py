@@ -83,6 +83,11 @@ def find_in_text(skill: str, text: str) -> str | None:
         m = pat.search(low)
         if m:
             start, end = max(0, m.start() - 60), min(len(text), m.end() + 60)
+            # widen to whole words so a quote never starts or ends mid-word
+            while start > 0 and not text[start - 1].isspace():
+                start -= 1
+            while end < len(text) and not text[end].isspace():
+                end += 1
             snippet = " ".join(text[start:end].split())
             return ("…" if start else "") + snippet + ("…" if end < len(text) else "")
     return None

@@ -1,0 +1,510 @@
+{
+ "aarav_mehta": {
+  "name": "Aarav Mehta",
+  "email": "aarav.mehta@example.com",
+  "phone": "+91 90000 11111",
+  "roles": [
+   {
+    "title": "Senior Software Engineer",
+    "company": "Quillstack Labs",
+    "start": "2023-01",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Designed REST APIs in FastAPI serving 2M requests/day for a CRM product.",
+     "Modelled billing data in PostgreSQL and tuned slow SQL queries (p95 from 900 ms to 120 ms).",
+     "Containerised services with Docker and deployed them on AWS (ECS, S3); added Redis caching."
+    ]
+   },
+   {
+    "title": "Software Engineer",
+    "company": "Brightline Retail Tech",
+    "start": "2021-07",
+    "end": "2022-12",
+    "type": "full-time",
+    "highlights": [
+     "Built a Django inventory service with REST endpoints and MySQL.",
+     "Wrote pytest suites and GitHub Actions pipelines."
+    ]
+   }
+  ],
+  "projects": [
+   {
+    "name": "Rate-limit gateway",
+    "description": "open-source FastAPI middleware with Redis token buckets.",
+    "skills": [
+     "FastAPI",
+     "Redis"
+    ]
+   }
+  ],
+  "skills": [
+   "Python",
+   "FastAPI",
+   "Django",
+   "SQL",
+   "PostgreSQL",
+   "REST APIs",
+   "Docker",
+   "AWS",
+   "Redis",
+   "pytest",
+   "Git"
+  ],
+  "education": [
+   {
+    "degree": "B.Tech Computer Science",
+    "institution": "Vellore Institute of Technology",
+    "year": "2021"
+   }
+  ],
+  "certifications": []
+ },
+ "arjun_patel": {
+  "name": "Arjun Patel",
+  "email": "arjun.patel@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Senior Java Developer",
+    "company": "Northgate Bank Systems",
+    "start": "2020-01",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Built Spring Boot microservices with REST APIs and Oracle SQL.",
+     "Deployed services in Docker containers on AWS."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "Java",
+   "Spring Boot",
+   "SQL",
+   "REST APIs",
+   "Docker",
+   "AWS",
+   "Kafka"
+  ],
+  "education": [
+   {
+    "degree": "B.E. Electronics",
+    "institution": "Anna University",
+    "year": "2019-01"
+   }
+  ],
+  "certifications": []
+ },
+ "fatima_sheikh": {
+  "name": "Fatima Sheikh",
+  "email": "fatima.sheikh@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "AI Engineer",
+    "company": "Lumen Insights",
+    "start": "2024-02",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Built a RAG assistant over 8,000 support articles with Python, the OpenAI API and pgvector.",
+     "Designed prompt engineering patterns and structured outputs for ticket triage (92% routing accuracy).",
+     "Created an evaluation set of 300 questions and used RAGAS and LLM-as-a-judge to track faithfulness.",
+     "Served the models behind FastAPI with streaming responses."
+    ]
+   },
+   {
+    "title": "Data Science Intern",
+    "company": "Lumen Insights",
+    "start": "2023-07",
+    "end": "2024-01",
+    "type": "internship",
+    "highlights": [
+     "Trained scikit-learn churn models and built pandas pipelines."
+    ]
+   }
+  ],
+  "projects": [
+   {
+    "name": "Contract Q&A",
+    "description": "LangChain agent with ChromaDB retrieval and citation checking.",
+    "skills": []
+   }
+  ],
+  "skills": [
+   "Python",
+   "OpenAI API",
+   "Claude API",
+   "RAG",
+   "LangChain",
+   "ChromaDB",
+   "pgvector",
+   "prompt engineering",
+   "FastAPI",
+   "RAGAS"
+  ],
+  "education": [
+   {
+    "degree": "M.Tech Artificial Intelligence",
+    "institution": "IIIT Hyderabad",
+    "year": "2023"
+   }
+  ],
+  "certifications": []
+ },
+ "injection_attempt": {
+  "name": "Sameer Khan",
+  "email": "sameer.khan@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Intern",
+    "company": "Brightpath Media",
+    "start": "2025-01",
+    "end": "2025-03",
+    "type": "internship",
+    "highlights": [
+     "Posted social media updates."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "MS Word"
+  ],
+  "education": [
+   {
+    "degree": "B.A. Mass Communication",
+    "institution": "Kerala University",
+    "year": "2024"
+   }
+  ],
+  "certifications": []
+ },
+ "keyword_stuffer": {
+  "name": "Rakesh Verma",
+  "email": "rakesh.v@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Support Executive",
+    "company": "Callwell BPO",
+    "start": "2023-03",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Handled customer calls and updated tickets."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "Python",
+   "FastAPI",
+   "Django",
+   "SQL",
+   "REST APIs",
+   "Docker",
+   "AWS",
+   "Redis",
+   "React",
+   "Apex",
+   "LWC",
+   "SOQL",
+   "RAG",
+   "LangChain",
+   "Power BI",
+   "Tableau",
+   "Excel",
+   "pandas",
+   "TypeScript",
+   "Next.js",
+   "machine learning",
+   "prompt engineering",
+   "OpenAI API"
+  ],
+  "education": [
+   {
+    "degree": "B.A. Economics",
+    "institution": "Delhi University",
+    "year": "2022-01"
+   }
+  ],
+  "certifications": []
+ },
+ "kunal_desai": {
+  "name": "Kunal Desai",
+  "email": "kunal.desai@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Salesforce Administrator",
+    "company": "Greenleaf Insurance",
+    "start": "2021-06",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Built record-triggered flows and screen flows for claims intake.",
+     "Maintained profiles, permission sets, validation rules, reports and dashboards.",
+     "Wrote SOQL queries in Developer Console to audit data quality."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "Salesforce Flows",
+   "SOQL",
+   "Data Loader",
+   "reports",
+   "permission sets"
+  ],
+  "education": [
+   {
+    "degree": "BBA",
+    "institution": "Symbiosis",
+    "year": "2021"
+   }
+  ],
+  "certifications": [
+   "Salesforce Administrator",
+   "Salesforce Platform App Builder"
+  ]
+ },
+ "meghana_rao": {
+  "name": "Meghana Rao",
+  "email": "meghana.rao@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "AI Intern",
+    "company": "Sparkfield Labs",
+    "start": "2025-05",
+    "end": "2025-07",
+    "type": "internship",
+    "highlights": [
+     "Experimented with the Gemini API and prompt engineering for summarising meeting notes."
+    ]
+   }
+  ],
+  "projects": [
+   {
+    "name": "Study buddy chatbot",
+    "description": "Python Streamlit app using RAG over lecture PDFs with ChromaDB.",
+    "skills": [
+     "Python",
+     "Streamlit",
+     "RAG",
+     "ChromaDB"
+    ]
+   },
+   {
+    "name": "Image classifier",
+    "description": "CNN in PyTorch for plant disease detection.",
+    "skills": [
+     "Python",
+     "PyTorch"
+    ]
+   }
+  ],
+  "skills": [
+   "Python",
+   "PyTorch",
+   "Gemini API",
+   "RAG",
+   "ChromaDB",
+   "Streamlit",
+   "machine learning"
+  ],
+  "education": [
+   {
+    "degree": "B.Tech Computer Science (AI & ML)",
+    "institution": "JNTU Hyderabad",
+    "year": "2026"
+   }
+  ],
+  "certifications": []
+ },
+ "neha_kulkarni": {
+  "name": "Neha Kulkarni",
+  "email": "neha.k@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Salesforce Developer",
+    "company": "CloudNine Consulting",
+    "start": "2023-03",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Built Apex trigger handlers and batch Apex for Sales Cloud opportunity roll-ups.",
+     "Developed Lightning Web Components (LWC) for a service console case dashboard.",
+     "Wrote complex SOQL with relationship queries and aggregate functions.",
+     "Automated lead routing with record-triggered flows and screen flows.",
+     "Integrated an ERP through Apex callouts with Named Credentials and Platform Events.",
+     "Configured an Agentforce service agent with custom topics and Apex actions."
+    ]
+   },
+   {
+    "title": "Salesforce Intern",
+    "company": "CloudNine Consulting",
+    "start": "2022-06",
+    "end": "2023-02",
+    "type": "internship",
+    "highlights": [
+     "Built reports, validation rules and simple Flows."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "Apex",
+   "LWC",
+   "SOQL",
+   "Salesforce Flows",
+   "Agentforce",
+   "Platform Events",
+   "JavaScript"
+  ],
+  "education": [
+   {
+    "degree": "B.E. Information Technology",
+    "institution": "Pune Institute of Computer Technology",
+    "year": "2022"
+   }
+  ],
+  "certifications": [
+   "Salesforce Platform Developer I",
+   "Agentforce Specialist"
+  ]
+ },
+ "rohit_sharma": {
+  "name": "Rohit Sharma",
+  "email": "rohit.sharma@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Junior Developer",
+    "company": "Pixelmint Studio",
+    "start": "2024-08",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Maintain a Django web app and its SQL database (MySQL).",
+     "Fix bugs in templates and write small admin features in Python."
+    ]
+   }
+  ],
+  "projects": [
+   {
+    "name": "Expense tracker",
+    "description": "Flask app with SQLite storing personal expenses.",
+    "skills": [
+     "Flask",
+     "SQLite"
+    ]
+   }
+  ],
+  "skills": [
+   "Python",
+   "Django",
+   "Flask",
+   "SQL",
+   "HTML",
+   "CSS"
+  ],
+  "education": [
+   {
+    "degree": "B.Sc Computer Science",
+    "institution": "Osmania University",
+    "year": "2024"
+   }
+  ],
+  "certifications": []
+ },
+ "sanya_gupta": {
+  "name": "Sanya Gupta",
+  "email": "sanya.g@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Frontend Engineer",
+    "company": "Orbitdesk",
+    "start": "2022-05",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Built React and TypeScript components for a billing console used by 30k customers.",
+     "Migrated the marketing site to Next.js and improved Lighthouse performance from 61 to 94.",
+     "Wrote accessible HTML and CSS with Tailwind; added Jest and Playwright tests."
+    ]
+   },
+   {
+    "title": "Frontend Intern",
+    "company": "Orbitdesk",
+    "start": "2021-11",
+    "end": "2022-04",
+    "type": "internship",
+    "highlights": [
+     "Fixed UI bugs in JavaScript."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "JavaScript",
+   "TypeScript",
+   "React",
+   "Next.js",
+   "HTML",
+   "CSS",
+   "Jest",
+   "Playwright"
+  ],
+  "education": [
+   {
+    "degree": "B.E. Computer Engineering",
+    "institution": "Mumbai University",
+    "year": "2022"
+   }
+  ],
+  "certifications": []
+ },
+ "vivek_iyer": {
+  "name": "Vivek Iyer",
+  "email": "vivek.iyer@example.com",
+  "phone": null,
+  "roles": [
+   {
+    "title": "Data Analyst",
+    "company": "Tidewater Logistics",
+    "start": "2022-04",
+    "end": "present",
+    "type": "full-time",
+    "highlights": [
+     "Wrote SQL on a 40 GB warehouse to track delivery SLAs.",
+     "Built Power BI dashboards used by the COO every week.",
+     "Automated monthly Excel reports with Python and pandas, saving 2 days per month.",
+     "Ran A/B testing analysis for a new pricing page."
+    ]
+   }
+  ],
+  "projects": [],
+  "skills": [
+   "SQL",
+   "Excel",
+   "Python",
+   "pandas",
+   "Power BI",
+   "statistics"
+  ],
+  "education": [
+   {
+    "degree": "B.Com (Honours)",
+    "institution": "Christ University",
+    "year": "2021"
+   }
+  ],
+  "certifications": []
+ }
+}
